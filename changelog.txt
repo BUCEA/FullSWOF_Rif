@@ -1,0 +1,731 @@
+Full Shallow-Water equations for Overland Flow, in two dimensions of space. 
+
+******************************************************************************
+
+TO DO LIST
+
+- Optimization based on domain parallelization
+- Find a formula to replace the MAX_ITER constant that represents the maximum
+   number of time steps
+
+******************************************************************************
+
+CHANGES
+=======
+
+2016-03-14
+- READY FOR TAG version 1.07.00
+
+2016-02-10
+- Update of the date of the file Documentation.tex.
+- In the Documentation, case 3 for the choice of friction replaced by a more coherent comment.
+
+2016-02-09
+- In the Documentation, case 3 added to the choice of friction and correction of the intermediate word.
+- HLLC2 default value (changes in Benchmarks and Exp01 parameters, doc, reference solutions), 
+as it is faster than HLLC and more complete than HLL.
+
+2016-02-08
+- In the Documentation, laminar friction added.
+- In the Documentation, explanation of the interest of HLLC solver.
+
+2016-01-14
+- hllc and hllc2 added in the documentation.
+- In the Documentation, clarification of the differences between HLL and HLL2.
+- Choices hllc and hllc2 added in the parameters files of the benchmarks
+- Add f_hllc2.hpp and f_hllc2.cpp files.
+
+2016-01-04
+- New HLLC2 version of the flux HLLC to account for the influence of intermediate waves.
+- doi corrected in doc.bib file for Bouchut04.
+- New flux HLLC to account for the influence of intermediate waves.
+
+2015-10-29
+- typo corrected in the word: Initialization.
+- update the header of files where I corrected the typo in initialization.
+- typo corrected in the word: initialization.
+
+2015-07-20
+- Upgrade to Doxygen 1.8.10
+
+2015-07-06
+- wrong reference for HLL2: Bouchut04 -> Batten97
+- minor correction in doxygen for the definition of the c_i in HLL and HLL2 (no absolute values on lambda)
+
+2015-05-26
+- test commit after sourcesup changes
+
+2015-04-03
+- UpdateDateVersion.sh: Check first for sed, doxygen, mktemp and egrep
+
+2015-03-10
+- correction of typos in make_config and infiltration.cpp
+- correction in doxygen of output.cpp
+
+2015-03-03
+- Correction of the bug 9686. There was an error of sign in the comparison between 0 and the coefficients (friccoef and Kc_coef) what caused these warnings.
+
+2015-03-02
+- READY FOR TAG version 1.06.00
+
+2015-02-19
+- cleaning of the code.
+
+2015-02-18
+- declaration of the space steps moved from Green-Ampt to infiltration. 
+- cleaning of the code.
+- addition of a remark for discontinuous friction coefficient in the documentation.
+
+2015-01-30
+- added \<variable\> in the comments because doxygen considered <variable> as a tag.
+- Doxygen_config_files (latex and html) updated for doxygen 1.8.9.1
+
+2015-01-28
+- resolution of warnings in the code with the compiler g++ 4.8.2.
+- updated of the documentation in order to use the friction. 
+- added the parameter "Name of the friction file <fric_NF> " in the parameters.txt file of the benchmarks.
+- deleted the array of frictions of the Scheme class because moved it in the Friction class.
+- added in the Friction class the deallocation of arrays in the destructor.
+
+2015-01-23
+- cleaning of the code after the merge 
+
+2015-01-07
+- modifications of Doxygen_style.tex for the command clearemptydoublepage
+- Doxygen_config_files (latex and html) updated for doxygen1.8.9.1
+- in the documentation, Doxygen version added
+- minor corrections in UpdateDateVersion.sh
+- correction of doxygen comments in libfrictions (changes in the parameters)
+- minor correction in doxygen (greenampt.hpp)
+
+2014-08-21
+- Merged from branches/Spatialization to trunk/
+
+2014-08-20
+- Merged the latest changes from trunk to the branch Spatialization
+- Correction of the bug 9394. hh1, uu1 and vv1 had not been initialized in the algorithms of linear reconstructions
+ENO and modified ENO at the order 2. Indeed, when we make a reconstruction of the variable in every point,
+it is necessary to initialize the interface with the value of the nearby cells.
+
+2014-07-11
+- READY FOR TAG version 1.05.00 
+
+2014-07-09
+- Replaced the newline in vtk_out.cpp file by a space so that the variable z is as the other variables. 
+- Modification of the Doxygen_style and Doxygen_config_latex files for doxygen 1.8.7. 
+In this new version, the Bug 626172 is corrected such that no latex expressions can
+be used in the doxygen tags. 
+Consequently, modification of the Doxygen_config_latex PROJECT_NUMBER; 
+in the doxygen style file, addition of a newcommand{\+} 
+and removal of \verb for $projectname. 
+- Modification of the UpdateDateVersion script to be consistent with doxygen 1.8.7. 
+
+2014-06-18
+- Addition of explanations (1D) in the doxygen comments of the fluxes. 
+
+2014/06/11
+- Added informations about the spatialized friction for the parameters.dat file and the screen output 
+
+2014-05-23
+- cleaning of shell scripts using <http://www.shellcheck.net/>
+- modification of Doxygen_config_files to be adapted to versions >= 1.8.2:
+'SHOW_DIRECTORIES', 'HTML_ALIGN_MEMBERS' and 'USE_INLINE_TREES' variables removed
+- "Exceptions to be treated" removed in doxygen comments (todo list) as errors are already treated
+
+2014-05-19
+- typos in parameters.cpp
+- alignment of the -- and ** lines in make bench
+- correction of the version number in the main Makefile
+
+2014-05-16
+- Benchmarking
+   * correction of bug when multiple benchref were carried out
+   * improvement of benchmark in Makefile
+   * correction and convergence with doc
+   * convergence with FullSWOF_1D Makefile
+- Display: convergence with FullWOF_1D (parameters.cpp)
+
+2014-05-15
+- new laminar friction law
+- modifications suggested in email 2013-05-13 (they do not affect the results, esp. on the rain):
+   * unit for the rain in parameters.cpp
+   * error in parameters.dat if rain==2, modified in parameters.cpp
+   * initialization of cur_time moved before Prain->rain_func(cur_time,Rain); in scheme.cpp
+   * in rain_generated.cpp, 'using namespace std' removed
+   * rain computation removed from order1.cpp (and becomes private in scheme.hpp)
+- modification in doxygen header of parameters.hpp, no_evolution_file.hpp/cpp, no_rain.cpp/hpp, rain_generated.cpp/hpp, no_infiltration.hpp, eno_mod.hpp, vtk_out.hpp
+- in hpp friction files, general formulation with U instead of u (doxygen)
+
+2014-05-14
+- in choice_output.hpp, function fc_var removed (unused)
+- in output.hpp, 'namefile' removed (unused)
+- in output, 'volum' replaced by 'volume'
+- in vtk.hpp, 'scount' removed (unused) 
+- in output files, 'tps' replaced by 'time'
+- in 'initial' and 'final' functions, parameters dx and dy removed as they are in the class
+- in outputs, 'sortie' replaced by 'outsave'
+- in vtk.cpp, version of FS added
+- modification of doxygen comments (outputs, schemes)
+- improvements in the names of variables (schemes) 
+
+2014-05-13
+- modification of doxygen comments (reconstructions)
+- reconstructions: modifications to avoid the repetition of the common part
+- destructor added in hydrostatic
+- hydrostatic: 'g' replaced by 'l' and 'd' replaced by 'r' in the names of variables/functions
+- biblio updated 
+- 'surface' replaced by 'soil' in greenampt comments
+- in rain, space steps are const
+- in rain_read.cpp, modification of the warnings and tps replaced by times
+- No_rain class renamed No_Rain
+- in greenampt: A==1 replaced by 1==A
+- modification of doxygen comments (rain_infiltration)
+- Improvement in makefile to make easier the 32- or 64-bit benchmarking.
+- Improvement in readme.txt and documentation.tex about running the benchmarks.
+- Some harmonization with the documentation of FullSWOF_1D
+
+2014-05-12
+- modification of doxygen comments (parameters, parser)
+- SCALAR frotcoef; char * tempo_topo, * tempo_huv, * tempo_rain, * tempo_suffix, * suffix; removed in parameters.hpp (unused)
+- 'choice of type' replaced by 'Choice of type' in parameters files
+- 'cflfix, value of' replaced by 'Value of' in parameters files
+
+2014-05-07
+- Cleaning in Doxygen_style.tex
+- Makefile: Use of variables for commands ar and rm
+- Correction of a glitch in Doxygen_style.tex
+- modification of doxygen comments (initializations .cpp)
+- in VanAlbada slope limiter, eps=1.e-15 replaced by EPSILON defined in misc.hpp
+- modification of doxygen comments (limiters)
+
+2014-05-06
+- Clarifications in readme.txt
+- Errors during LaTeX and BibTeX compilations
+- Update of standard results because of changes in the previous versions about the rain calculation and the introduction of long double in HLL
+- Correction of a glitch in the Makefile
+- modification of doxygen comments (friction .hpp)
+- modification of doxygen comments (friction .cpp)
+- modification of doxygen comments (initializations .hpp)
+- headers makefile (libfriction, libflux, libboundaryconditions)
+- update of doc.bib to avoid compilation errors
+- in huv_generated_radial_dam_dry, huv_generated_radial_dam_wet, huv_generated_thacker and topo_generated_thacker: 'milieu' replaced by 'mid' and 'rayon' replaced by 'radius'. 
+
+2014-04-30
+- modification of doxygen comments (boundary conditions .hpp)
+- modification of doxygen comments (boundary conditions .cpp)
+- modification of doxygen comments (flux .hpp)
+- modification of the tests in the fluxes: h<=0 replaced by h<HE_CA
+- modification of doxygen comments (flux .cpp)
+
+2014-04-29
+- new version of the HowToRelease file with Windows releases.
+- main file renamed as in 1D
+- modification of doxygen comments
+
+2014/04/14
+- READY FOR TAG version 1.04.10
+- Update of the documentation for creating a new release.
+
+2014/03/18
+- Added the header file ctime to use the clock type clock_t.
+
+2014/03/12
+- bound_flux_tot replaced by Vol_bound_tot as it is a volume.
+- Correction in the header of misc.hpp: changed FullSWOF_1D by FullSWOF_2D.
+- Corrections in the comments/doxygen of output.cpp.
+
+2014/03/11
+- Added cpu time and minor modifications in results.dat.
+- Modification of the header of parameters.dat.
+- Modification in the flux_boundaries_BT.dat and flux_boundaries_LR.dat files: time moved in the last column so that the results are less confused.
+- Deleted difference_g1 and difference_f1 because they are useless.
+- Total_discharge_outflow replaced by Total_volume_outflow as it is a volume
+- Correction of the description of the fluxes in debug mode.
+
+2014/03/03
+- Moved initialization of FRICCOEF in scheme.cpp file so that it is more coherent with scheme.hpp file.
+
+2014/02/25
+- Minor modification in the description of the fluxes in the flux_boundaries_BT.dat and flux_boundaries_LR.dat files.
+- Minor correction in gnuplot.cpp file: setw(9) added for a better alignment of the data.
+- Documentation: minor correction in the description of the boundaries_flux.dat file.
+- Minor correction in check_vol.dat file (tps replaced by time).
+- Minor correction in boundaries_flux.dat file
+- Correction in the description of the fluxes in boundaries_flux.dat file.
+- In debug mode: changed the units in the boundaries_flux.dat file because it's more relevant (m^3 replaced by m^2).
+- Documentation: details for the output files in debug mode added
+
+2014/02/07
+- ifndef PARSER_HPP moved from parameters.cpp to parameters.hpp (advised by Thomas H.) and modification of the makefiles to enable compilation
+- Correction in the description of the parameter Ks, that stands for the hydraulic conductivity of the soil, not of the surface.
+
+2014/02/06
+- Minor correction in greenampt.cpp: useless comment deleted.
+
+2014/02/05
+- Reference to FullSWOF (http://hal.archives-ouvertes.fr/hal-00932234) added in the documentation
+- Application note about floating points computation added
+- new option -ffloat-store in make_config to avoid numerical approximations
+- in hll, muscl and scheme, long double are used locally to avoid numerical approximations
+
+2013/11/20
+- Updated the documentation for creating a new release. We added the step to update the documents on the web site.
+
+2013/11/07
+- Updated the documentation for creating a new release. We added the step to update the tags directory.
+- READY FOR TAG version 1.04.08
+
+2013/09/09
+- Documentation for creating a new release added in doc/
+
+2013/06/14
+- Minor correction in the Documentation.tex file to see the URL of SWASHES.
+
+2013/06/13
+- Reference for SWASHES updated.
+- We added the unistd.h file because it contains the R_OK variable and the access function, unfortunately certain compilers do not contain them by default what can generate errors during the compilation.
+
+2013/06/10
+- bug fixed: For the rain computing in the order 2, when we computed the water height at the intermediate time, 
+      the rain intensity must be taken at the present time (time=n*dt) and not at the current time plus the time step (time=(n+1)*dt).
+- Deleted the call of the check_vol() method in the scheme constructor because we don't know the value of the flux before the time equal to 0s.
+
+2013/06/07
+- Deleted the Rain parameter of the boundaries_flux() method because it's useless.
+- Minor correction in the Documentation.tex file.
+- Correction in the output.cpp and Documentation.tex files: deleted Streammed.
+- Correction in the output.cpp file: replaced cout by cerr of the display of error. 
+- Correction in the output.cpp file: deleted ./Outputs/ of the display of error because the output directory can change name.
+- Correction in the parameters.hpp file: deleted the declaration of Ks,dtheta,Psi,zcrust,Kc,imax because they are useless.
+- Minor corrections in the parameters.cpp file: updated the comments in the fill_array method.
+- Correction in the parameters.cpp file: deleted the val_init_max array because it's useless.
+- Minor corrections in the parameters.cpp file: replaced Ks by Kc in the treatment of Kc and we deleted (1=file 2=const_coef) additional because it's useless.
+- Correction in the parameters.cpp file: deleted the the condition else after if (inf < 0 || inf >1) because it's useless.
+- Minor corrections in the parameters.cpp file: deleted comment (1.7e-8) for the coefficients Ks and Kc.
+- Minor corrections in the parameters.cpp file: replaced the expression "necessary to have a file" by "necessary to specify a file".
+- Minor corrections in the parameters.cpp file: replaced Dtetat by dtheta and the expression "to make a choice for the" by "to choose the".
+- Minor corrections in the parameters.cpp file: replaced @param[inout] by @param[in,out] for doxygen. Replaced "ERROR: It is" by "ERROR: it is" and initilization by initialization.
+- Updated greenampt.cpp file: We replaced the name of the class NoInfiltration by No_Infiltration to have more coherence with the other classes.
+- Minor corrections in the greenampt.cpp file: we replaced the expression "the value of the" by "the value at the point" and we replaced "///end" by "//end" becaause ///end has a a meaning for doxygen.
+
+2013/06/06
+- Updated greenampt.cpp file: combination of the two conditions of initialization from a file in one.
+- Minor corrections in the Source/librain_infiltration directory: changed Nxcell and Nycell by NXCELL and NYCELL.
+- Replaced exit(-1) by exit(EXIT_FAILURE).
+- Minor correction in the parameters.txt file: changed Dteta by dtheta.
+- Minor corrections in the Exp01/parameters.txt file: deleted the choice 2 (2=file) in infiltration model because it does not exist and changed the value 1.8e-9 m/s by 1.8e-6 m/s for Kc and Ks parameters.
+- Minor correction in the parameters.txt file: deleted comment (1.7e-8) for the coefficients Ks and Kc.
+- Minor correction in the topo_read.cpp file.
+- Corrections in Benchmarks/Dry_Dam_Break/Inputs directory: Updated comments of huv_init.dat and topography files.
+- Minor corrections in the topo_read.cpp file: doxygen updated with warnings and replacing i iterator by it to make a difference with the iterator of the for loop. Replaced exit(-1) by exit(EXIT_FAILURE) and Error by ERROR.
+  
+- Minor corrections in the huv_read.cpp file: doxygen updated with warnings and replacing i iterator by it to make a difference with the iterator of the for loop.
+- Minors corrections in the huv_read.cpp file: replaced exit(-1) by exit(EXIT_FAILURE) and Error by ERROR.
+
+2013/05/06
+- Minor correction in the parser.cpp file.
+- Updated topo_read.hpp file: The second initialization (car='#') is deleted because it is useless.
+- Updated huv_read.cpp and topo_read.hpp files: Corrections in the comments.
+
+2013/04/30
+- Updated the documemtation.
+
+2013/04/23
+- bug fixed: We resized the modified water height (hmod) and the infiltrated total volume (Vin) so that they are the same size of h because h receives a copy of hmod.
+- bug fixed: At the order 2, the infiltrated total volume at the next time step must be computed with the infiltrated volume at the intermediate step (Vin1)
+   and not only with the volume infiltrated corresponding at the initial step (Vin2). So, we replaced Vin2 by Vin1 in the function maincalcscheme.
+   Furthermore, in the case of fixed cfl, we have added a initialization if verif==0 because we must restart from initial step (Vin2).
+
+2013/03/21
+- Deleted the file that records the evolution of the volume infiltrated with respect to the infiltration capacity.
+  
+2013/03/20
+- Creation of a new version (1.04.00) for the spatialization of the infiltration coefficients.
+  
+2013/03/14
+- Updated figures of documemtation: added the critical height.
+
+2013/03/11
+- Modification of the infiltration interface. Moved the initialization (realized in the scheme's constructor)
+  of Green-Ampt variables (Ks,Kc,Zcrust,D'Theta,Psi) in Green-Ampt's constructor.
+- Updated the documemtation.
+- minor corrections in the parser.hpp and parser.cpp files
+
+2013/03/08
+- bug fixed: To resolve the problem of the infiltration (i.e, the difference between kc=0 and the case no infiltration),
+   we treated separately the case of crust (zcrust) is equal to zero (modification proposed by F. James and C. Lucas).
+
+2013/01/28
+- Updated the headers of the hpp and cpp files.
+
+2013/01/09
+- Benchmarking: updated the comp_STANDARD.dat (64 bits) files because of the last modifications.
+- Benchmarking: updated the comp_STANDARD_32bits.dat files because of the last modifications.
+
+2012/10/18
+- Modification in the Benchmark directory: changed the unit of the discharge along x and along y (m^2/s) by the m^3/s unit in analytic.dat files.
+
+2012/10/11
+- Added the ceil function in the computation of row and column in topo_read.cpp and huv_read.cpp files.
+- Modification in the final check in topo_read.cpp and huv_read.cpp files: added the value of the missing point.
+
+2012/10/02
+- Added the figure MacDonald_b2.pdf in the documentation to show the shape of the channel in the fluvial Mac Donald pseudo-2D test.
+
+2012/09/25
+- minor corrections in the Documentation.tex file.
+
+2012/09/10
+- Updated the figure of Dam break in the documentation with the new length of the domain.
+- Updated the dry dam break benchmark: changed the length of the domain so that the value of the diagonal is equal to 10. 
+
+2012/09/07
+- Added a macro definition RATIO_CLOSE_CELL to verify that the input data is very close to cell center
+- Simplification in the check that the initial data are in the domain of computation.
+
+2012/09/06
+- Added a macro definition MAX_SCAL to replace DBL_MAX. In topo_read.cpp and huv_read.cpp files, MAX_SCAL is used to initialize.
+ the arrays to verify that the input files are correct.
+- Added initialization of character to know if the commentary begins by the # symbol
+
+2012/08/29
+- Updated the documentation: all the figures are enlarged to see better curves.
+- Updated the documentation: the figure of Dam break test case is enlarged to see the curve better.
+- Updated the documentation: Correction in the description of Thacker test case.
+
+2012/07/26
+- Benchmarking: Add of an automatic procedure to compare the benchmark results [F. Darboux]
+
+2012/07/19
+- Updated scheme.cpp file: the tests with "flux_num->get_cfl()*...<epsilon" replaced by "fabs(flux_num->get_cfl()*...)<epsilon". 
+- Updated scheme.cpp file: replaced par.get_..() method by nchoice integer in Choice_condition constructor because the call of this method is useless. 
+
+2012/06/27
+- Updated topo_read.cpp and huv_read.cpp files: improved the methods to read the user's initialization files. 
+
+2012/06/20
+- Deleted dx and dy variables in topo_read.hpp because they are not necessary.
+- Updated the files in libinitializations directory: replaced variables (Nxcell,Nycell,dx,dy) by constant variables (NXCELL,NYCELL,DX,DY).
+- Deleted h, u and v arrays in initialization_huv.cpp and initialization_huv.hpp files because they are not necessary.
+
+2012/06/19
+- Correction in make_config: in debug option, replaced -Wfloat-equa by -Wfloat-equal.
+
+2012/06/18
+- minor correction in scheme.hpp and a==0 replaced by a<epsilon in scheme.cpp.
+- Replaced l letter by j in the for loop.
+
+2012/06/15
+- Documentation of FullSWO_2D updated.
+
+2012/06/11
+- Updated scheme.cpp and scheme.hpp files: replaced variables by constant variables.
+
+2012/06/08
+- Updated the parameters.txt of Exp01 directory with the advised values in Documentation.pdf file.
+- Updated the dry dam break figures in Documentation.pdf
+- Updated the dry dam break benchmark: changed the length of the domain in respect to x and y because there was an error in the computation of the length cells.
+
+2012/06/07
+- Updated the figures in Documentation.pdf.
+- New topography files for the MacDo Benchmarks: positive topography
+
+2012/06/06
+- Correction in Benchmarks: the column of topography had a error in MacDo_Rain and MacDo_tor_flu_tor_Man benchmarks.
+
+2012/06/05
+- Documentation of FullSWO_2D updated.
+
+2012/06/01
+- sourcesup.cru replaced by sourcesup.renater
+- TO DO LIST updated.
+
+2012/05/31
+- Replaced the l loop commentary by j loop in Sources/libsave directory.
+- Updated scheme.hpp file: deleted cfl_new commentary and added % symbol to avoid the links in doxygen.
+- Updated the maximum number of Newton iterations: changed maxiter=100 by maxiter=10000.
+
+2012/05/25
+- Updated scheme.cpp and scheme.hpp files: changed h1g->h1left, h2g->h2left, h1d->h1right and h2d -> h2right.
+- Updated the files in libflux directory: changed ug -> u_L, vg -> v_L, hg -> h_L, ud -> u_R, vd -> v_R, hd -> h_R, qg -> q_L, qd -> q_R.
+- Updated scheme.cpp and scheme.hpp files: deleted some useless variables and added comments.
+- Updated Newton solver: added flag to avoid multiple warning messages, changed the value of tolerance and the initialization of the Newton solver.
+
+2012/05/24
+- Replaced the words beginning with desalloc by dealloc.
+- Updated Macdo benchmarks: replaced the value of each point in x by a mean value over 10 cells.
+
+2012/05/15
+- Replaced [i][l] index in output files by [i][j] because they are standard index.
+- Replaced the name of Benchmark directories by a short name.
+- Updated the analytic.dat files in Benchmarks directories in order to write in the header of the files the changes were done with convert_swashes_1D_to_2D version script.
+
+2012/05/09
+- Updated the analytic.dat files in Benchmarks directories in order to have the same format as Benchmarks/Thacker_planar_surface_in_paraboloid/analytic.dat
+
+2012/05/07
+- Updated the analytic.dat file in Benchmarks/Dam_break_Dry_without_friction directory in order to have the same format as huv_final.dat
+- Updated the analytic.dat files in Benchmarks/MacDo_Rain_long_channel_flu_DW and Benchmarks/MacDo_Rain_long_channel_tor_DW directories
+ in order to have the same format as huv_final.dat
+- Updated the analytic.dat file in Benchmarks/MacDo_Short_channel_smooth_transition_shock directory in order to have the same format as huv_final.dat
+- Updated the parameters.txt files in Bump and Dam break Benchmarks: no friction case is chosen to avoid 
+  'friction law with null friction coefficient' warning. 
+- Updated the parameters.txt files in Benchmarks: the no infiltration case is used instead of GreenAmpt model with kc=0.  
+- Updated the parameters.txt file in Benchmarks/Thacker_planar_surface_in_paraboloid directory: no friction case is chosen to avoid  
+  'friction law with null friction coefficient' warning.  
+- Updated the analytic.dat file in Benchmarks/Thacker_planar_surface_in_paraboloid directory: in case of infiltration parameters
+  Kc=0 replaced by "no infiltration" choice.  
+- Updated the analytic.dat file in Benchmarks/Dam_break_Dry_without_friction directory
+  with the convert_swashes_1D_to_2D script and the version 1.01.03 of SWASHES
+
+2012/05/04
+- Updated the analytic.dat file in Benchmarks/MacDo_Short_channel_smooth_transition_shock directory
+  with the convert_swashes_1D_to_2D script and the version 1.01.03 of SWASHES
+- Updated the analytic.dat files in Benchmarks/MacDo_Rain_long_channel_tor_DW and Benchmarks/MacDo_Rain_long_channel_flu_DW directories
+  with the convert_swashes_1D_to_2D script and the version 1.01.03 of SWASHES
+- Updated the analytic.dat files in Benchmarks/MacDo_Pseudo_2D_long_channel_flu_Man and Benchmarks/MacDo_Pseudo_2D_short_channel_tor_Man directories
+  with the version 1.01.03 of SWASHES
+- Updated the analytic.dat file in Benchmarks/Thacker_planar_surface_in_paraboloid directory with the version 1.01.03 of SWASHES
+
+2012/05/02
+- message "deallocation" printed in debug mode at the end
+- in f_hll.cpp, changes in the tests to be coherent: a<0, a>0, a==0 replaced by a<-epsilon, a>epsilon, fabs(a)<epsilon
+- minor corrections: variable==const replaced by const==variable to avoid errors with only =.
+- in choice_rain.hpp: the commentary of the rain_func function corrected.
+- header of no_infiltration.hpp file updated.
+- header of rain.hpp file updated.
+- Deleted namespace in no_rain.cpp because it's unnecessary.
+- minor corrections in scheme.cpp, no_rain.cpp and no_rain.hpp: headers and comments updated
+- Correction in Documentation.tex file: in the case 2 of the rain parameters, the rain intensity 10e+05 m/s replaced by 10e-05 m/s.
+
+2012/04/26
+- Modification in the warning of the maximum number of time steps (MAX_ITER) in order to be more specific.
+
+2012/04/25
+- M (the variable of the time step) deleted and it replaced by MAX_ITER constant.
+- in the choice of Boundary condition (in parameters.txt): liquid renamed imp.h and imp_discharge renamed imp.q
+- Class bc_imp_h renamed bc_imp_height
+
+2012/04/24
+- Modification in the format of the output file VTK: Point Data description replaced by Cell Data.
+- Correction in the contitional statement of the Maximum permitted Iteration (MAX_ITER) warning: M==n replaced by n>M.
+- Added in Exp01/Inputs/parameters.txt the choice 0 for the rain treatment.
+
+2012/04/17
+- Added no_rain.cpp and no_rain.hpp files for the rain treatment.
+- The  "No_rain" class added in the rain treatment. Moreover in parameters.txt file: in the choice of rain, the intensity of the rain equals to 36 mm/h in the case 2.
+- Added a warning to inform the user if the computation finished because the Maximum permitted Iteration was reached.
+- Added in misc.hpp a MAX_ITER constant that represents the Maximum permitted Iteration in misc.hpp.
+
+2012/04/16
+- README.txt updated: added a commentary to use the script "UpdateDateVersion.sh" and divers.hpp replaced by misc.hpp
+- minor correction in parameters.cpp: the error messages for rain and output parameters updated.
+
+2012/04/03
+- updated the date YY-MM-DD
+- Correction of bug when compiling FullSWOF_2D: added no_evolution_file.hpp and no_evolution_file.cpp files because they were not uploaded.
+
+2012/03/30
+- commentary added to explain the choice of T_output=2*T.
+- minor corrections in parameters.cpp: cout replaced by cerr in error messages.
+- minor corrections in parameters.cpp: "parameters.txt: ERROR" added in output messages.
+- minor corrections:huv_movie replaced by huz_evolution in commentaries.
+- minor correction in parameters.cpp (error replaced by ERROR).
+- Added no_evolution_file.cpp class for the case of nbtimes=0. In fact, in this condition we don't create
+ the file to see the evolution of variables (h,u ...). 
+
+2012/03/29
+- Change output file name: huv_movie.dat -> huz_evolution.dat.
+- in paramaters.cpp: initialization of discharge's variables for liquid condition deleted because it's useless.
+
+2012/03/27
+- warning added in parameters.cpp when dtheta seems very large.
+- parameters.cpp updated with warning and error messages.
+- Changes in parameters.cpp for the fixed dt treatment.
+- Changes in parameters.cpp for the CFL number treatment.
+- Changes in parameters.cpp for the scheme type treatment.
+- minor correction in parameters.cpp: order==2 replaced by 2==order to avoid errors with only =.
+- Correction of error in the choice of periodic condition: the choice in switch is 4 and no 5.
+- Changes in parameters.cpp for output format treatment.
+- huv_final.dat -> huz_final.dat, init -> huz_initial.dat,Results.dat -> results.dat
+- Changes in parameters.cpp for rain treatment.
+- in parameters.cpp: huv_initialization replaced by huv_init.
+- Changes in parameters.cpp for h and u initializations.
+- Correction in topography treatment: topography_namefile added because it deleted by mistake.
+- Changes in parameters.cpp for topography treatment.
+- limiter moved after amortENO, modifENO, in parameters.txt and Documentation. 
+- in paramaters.cpp: limiter moved in the same condition (if order == 2) than rec.
+- in paramaters.cpp: exit function added for amortENO and modifENO treatment in case of error.
+
+2012/03/26
+- changes warning for friction and Kc in parameters.cpp to clarify the message.
+- minor corrections in parameters.cpp with y==n (number) replaced by n==y to avoid errors with only = 
+- Correction in parameters.cpp for infiltration treatment: Added a condition to read the values of infiltration's parameters (Kc ...)
+   when the case differs from no infiltration 
+- Correction in parameters.cpp for reconstruction treatment: Added a condition to execute the reconstruction in case of the order 2 only.
+- Changes in parameters.cpp for limiter treatment.
+- Changes in parameters.cpp for reconstruction treatment.
+- Changes in parameters.cpp for order of the scheme treatment.
+- Correction in parameters.cpp for friction treatment: Verication positive friction coefficient
+   in case of Manning or Darcy-Weisbach only.
+- Changes in parameters.cpp for numerical flux treatment.
+- The libinitialization's name changed by libinitializations
+
+2012/03/23
+- in no_friction.cpp: Darcy Weisbach commentary deleted.
+- The choice "NoInfiltration" added for the infiltration model parameter.
+- The choice "NoFriction" added for the Friction law parameter.
+- Changes in parameters.cpp for boundary conditions treatment.
+- -Wfloat-equa option added in DEBUG mode to know when floating point values are used in equality comparisons.
+- in the Scheme class, the name of bloc1 and bloc2 methods replaced by maincalcflux and maincalcscheme.
+- in the Scheme class (to compute qes1 and qes2): x^2-y^2 replaced to avoid numerical errors.
+ 
+
+2012/03/22
+- Add of application note for windows' users
+- Updated misc.hpp file and the files in doc/ directory to run the script bin/UpdateDateVersion.sh.  
+- Correction of error when running the script bin/UpdateDateVersion.sh with doxygen version 1.8.0 (bibliography)
+
+2012/03/12
+- Added script bin/UpdateDateVersion.sh (for updating date and version number, and compiling LaTeX and Doxygen documentation)
+- Correction in libsave directory: changed Nxcell and Nycell by NXCELL and NYCELL.
+
+2012/03/09
+- Correction of the file's name:huv_generated_Radial_Dam_wet.cpp and huv_generated_Radial_Dam_wet.hpp by huv_generated_radial_dam_wet.cpp and huv_generated_radial_dam_wet.hpp ( idem for ..dry)
+- Correction in libboundaryconditions directory: changed Nxcell and Nycell by NXCELL and NYCELL because they are constant variables.
+- Changed the name of the token in #ifndef: it's with capital letter and it's the same of the file's name.
+
+2012/03/08
+- Added a new parameter <nbtimes> in parameters.txt file. Now we can choice the number of times saved in huv_movie.dat file.  
+- Added error controls in parameters.cpp file.
+- Removed default value in choice*.cpp files.
+- Changed the name of class: the name of class begins with a uppercase.
+- Correction: the name of constant variable is in capital letter.
+- Correction: the name of the files is in small letter.
+  
+2012/03/05
+- modif of the documentation and Readme.txt for windows users
+- Correction in order1.cpp: added the computation of the total cumulated water height.  
+
+2012/02/22
+- Added a target-specific variable "DEBUG" to save the flux files only when make is running in Debug mode.  
+
+2012/01/26
+- Correction in name of Thacker_planar_surface_in_paroboloid directory: new name is Thacker_planar_surface_in_paraboloid 
+
+2012/01/25
+- Updated paramaters.cpp: So, parameters.txt and parameters.dat files are the same
+
+2012/01/24
+-Documentation updated and changed "cfl fixed" by "fixed cfl" and "dt fixed" by "fixed" dt in parameters.txt and parameters.cpp files.
+
+2012/01/20
+- Creation of a new version (release-1.02.00) for an additional parameter: running with a time step fixed
+
+2012/01/18
+- Documentation: section "validation" completed with SWASHES
+- Added analytic.dat files in each sub-directory of the Benchmarks's directory 
+- Added h+z,norm_U,Froude,qx,qy and q in the file vtk.cpp
+
+2012/01/13
+- Correction in the outputs: when h=0, u,v,||U||,qx,qy and q=0, and Fr=NaN 
+- in choices: default values added when possible, error message in the other cases
+
+2012/01/12
+- Comments in parser.hpp to have the lines to add when the parser is used independently
+- REEL changed into SCALAR
+- File name divers.hpp changed into misc.hpp
+- Redundant #include... removed
+
+2011/12/09
+- Added the cfl value, fixed by user, as a constraint for the time discretization.
+- Optimization of double loop in the bloc 1 function located in scheme.cpp file.
+   Indeed, we put the choice of scheme_type out of the loop.
+
+2011/11/24
+- Added fixed time step.
+
+2011/10/06
+- Added 8 benchmarks: 1 bump, 5 Macdo, 1 Dam break and 1 Thacker
+- change the name of Benchmark directory to Benchmarks directory
+- update doc
+
+2011/09/15
+- moved the function desallocation() called from the destructors of order1 and order2 to 
+  the scheme's destructor.
+- Added the display of information about Rain in the parameters.cpp file  
+
+2011/09/12
+- changed the initialization of h to simulate the dam break: h=0.005 m  
+
+2011/08/11
+- license paragraph in doc
+- headings with the license in the Headers files
+- headings with the license in the Sources files
+- moved FullSWOF_2.cpp file in the Sources directory
+
+Modifications before the 2011/08/05
+- name of the executable without .exe
+- modifs of the change file
+- reference of the version added in each file - defined in divers.hpp
+- Deleted target install in Makefile
+- improvement of doc
+- Debug mode
+
+Modifications before the 2011/08/03
+- Deleted Infiltration from scheme.cpp and copy to Green-Ampt.cpp
+- Modification rain_read.cpp: Now we can put empty line and commentary
+   beginning by "#" in the rain.dat
+- Added  Kc, hydraulic conductivity" in parameters.txt                                       
+- Added  imax, Maximun infiltration rate" in parameters.txt                                       
+- Added variable DEBUG in make_config's file to have 2 modes of compilation
+- Deleted the output of make: adde a redirection "> /dev/null" in Makefile principal
+- correction in rain_read.cpp: redefinition of tab_bool 
+- Added  display of the percentage of elapsed time 
+- Directory Analytic_solutions deleted                                       
+
+Modifications  before the 2011/04/01
+- To consider h u v and z in the middle of the cells
+- Initialization cells at the boundary in directory libboundaryconditions
+- Added periodic condition in the directory libboundaryconditions
+- Added function 'froude_number'
+- Added file 'boundaries_flux.dat'
+- Deleted file 'Ic.dat'
+- Added imposed discharge in the boundary condition
+
+Modifications  before the 2010/11/15
+- Added verif = 1 in the file order2.cpp after expression else because
+  the reconstruction hydrostatic wasn't done if dt2 < dt1
+
+Modifications  before the 2010/11/05
+- Added New parser
+
+
+Modifications before the 2010/08/03
+- Added explicit friction in libfriction for erosion simulation
+- Erased specific variables in order2 to call bloc1, bloc2 and reconstruction
+	
+Modifications before the 2010/07/03
+- Added the library libsave to gather all the output
+- New class to choose the type of the output file (only gnuplot for the moment)
+- modifENO added in the parameters.txt with the value 1.8
+- The output directory "Outputs" is uniquely defined in parameters.cpp and
+ can be changed easily with a suffix.
+
+Modifications before the 2010/06/01
+bug fixed: Bad declaration in bloc1 of dt_cal, so that added SCALAR & dt_calc because the value change.
+           Removal "dt1=min(dimt-tps,dt1)" in bloc1 and Addition just after bloc1 is called.
+
+- Deleted variable tps_ca in divers.h
+- changed condition to stop in order2 and order 1:
+ the new condition is : while (dimt > tps && n < M+1)
+
+Modifications before the 2010/05/01
+bug fixed: The variables delzc1 and delzc2 were defined with global's property,
+	now they are arguments in fonction bloc2	
+
+- Update of parametres.txt file
+- Modifications for a best visualisation with gnuplot
+- Update order1 in order to use boundary function
+- Added librairy cstdlib in delimitedfileparser.cpp because exit function was unknow.
+- Added iomanip in order 1 and order 2 for setw function

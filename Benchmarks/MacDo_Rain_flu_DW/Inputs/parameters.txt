@@ -1,0 +1,93 @@
+#####################################################################
+# Input parameters for FullSWOF_2D software.
+#####################################################################
+
+Number of meshes (x-axis)  <Nxcell>:: 200
+Number of meshes (y-axis)  <Nycell>:: 10
+
+Time of simulation <T>:: 3000.
+Number of times saved <nbtimes>:: 2
+
+Choice of type of scheme (1=fixed cfl  2=fixed dt) <scheme_type>:: 2
+Timestep (in seconds) <dtfix>:: 0.147
+Value of the cfl  <cflfix>:: 0.5
+
+Length of the domain in respect to x  <L>:: 1000.
+Length of the domain in respect to y  <l>:: 10.
+
+
+Left Boundary condition   (x = 0)   (1=imp.h 2=wall 3=neumann 4=periodic 5=imp.q)  <Lbound>:: 5
+Imposed discharge in left bc <left_imp_discharge> :: 10.
+Imposed water height in left bc (if flow super critical) <left_imp_h>:: 0.748324
+
+Right Boundary condition (x = xmax)(1=imp.h 2=wall 3=neumann 4=periodic 5=imp.q)  <Rbound>:: 1
+Imposed discharge in right bc <right_imp_discharge> :: 0.5
+Imposed water height in right bc (if flow super critical) <right_imp_h>:: 0.748324
+
+Bottom Boundary condition (y = 0)   (1=imp.h 2=wall 3=neumann 4=periodic 5=imp.q)  <Bbound>:: 2
+Imposed discharge in bottom  bc <bottom_imp_discharge> :: 0.0005
+Imposed water height in bottom bc (if flow super critical) <bottom_imp_h>:: 0.005
+
+Top Boundary condition bc (y = ymax)(1=imp.h 2=wall 3=neumann 4=periodic 5=imp.q)  <Tbound>:: 2
+Imposed discharge in top bc <top_imp_discharge> :: 0.0005
+Imposed water height in top bc (if flow super critical) <top_imp_h>:: 0.005
+
+Initialization of Friction (1=file 2=const_coef) <fric_init>:: 2
+Friction law (0=NoFriction 1=Manning 2=Darcy-Weisbach 3=laminar)  <fric>:: 2
+Name of the friction file  <fric_NF>:: 
+Friction coefficient  <friccoef>:: 0.093
+
+Numerical flux (1=Rusanov 2=HLL 3=HLL2 4=HLLC  5=HLLC2)  <flux>:: 5
+
+Order of the scheme (1=order1 2=order2)  <order>:: 2
+
+Reconstruction (1=MUSCL 2=ENO 3=ENOmod)  <rec>:: 1
+AmortENO (Between 0 and 1.)  <amortENO>:: 0.25
+ModifENO (Between 0 and 1.)  <modifENO>:: 0.9
+Limiter (1=Minmod 2=VanAlbada 3=VanLeer)  <lim>:: 1
+
+Infiltration model (0=No Infiltration 1=Green-Ampt)  <inf>:: 0
+zcrust, thickness of the crust  (1=file 2=const_coef) <zcrust_init>:: 2
+Name of the zcrust file <zcrust_NF>:: 
+zcrust coefficient <zcrustcoef>:: 0.01
+
+
+Kc, hydraulic conductivity (saturation) of the crust (1=file 2=const_coef) <Kc_init>:: 2
+Name of the Kc file <Kc_NF>:: 
+Kc coefficient  <Kccoef>:: 1.8e-5
+
+
+Ks, hydraulic conductivity (saturation) of the soil (1=file 2=const_coef) <Ks_init>:: 2
+Name of the Ks file <Ks_NF>:: 
+Ks coefficient  <Kscoef>:: 0.
+
+
+dtheta, water content  (1=file 2=const_coef) <dtheta_init>:: 2
+Name of the dtheta file <dtheta_NF>:: 
+dtheta coefficient  <dthetacoef>:: 0.254
+
+
+Psi, load pressure (1=file 2=const_coef)  <Psi_init>:: 2
+Name of the Psi file <Psi_NF>::
+Psi coefficient   <Psicoef>:: 0.167 
+
+
+imax, Maximun infiltration rate (1=file 2=const_coef)  <imax_init>:: 2
+Name of the imax file <imax_NF>:: 
+imax coefficient   <imaxcoef>::  5.7e-4
+
+cflfix, value of the cfl  <cflfix>:: 0.4
+
+Topography (1=file 2=flat 3=Thacker)  <topo>:: 1
+Name of the topography file  <topo_NF>:: topography.dat
+
+Initialization of h, u and v (1=file 2=h,u&v=0 3=Thacker 4=Radial_Dam_dry 5=Radial_Dam_wet)  <huv_init>:: 1
+Name of the huv initialization file  <huv_NF>:: huv_init.dat
+
+Rain (0=no rain 1=file 2=function)  <rain>:: 1
+Name of the rain file  <rain_NF>:: rain.txt
+
+Suffix for the 'Outputs' directory  <suffix_o>::
+
+Format of the Output file (1=gnuplot 2=vtk)  <output_f>:: 1
+

@@ -1,0 +1,748 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX spellcheck = en_US
+
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{natbib}
+\usepackage{lastpage}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{hyperref}
+
+%% Specific commands
+% the only place to specify version number (for consistency) - the date is the last modif for the code
+\newcommand{\version}{1.07.00 (2016-03-14)}
+\newcommand{\FullSWOF}{\emph{FullSWOF\_2D}}
+\newcommand{\FullSWOFUI}{\emph{FullSWOF\_UI}}
+\newcommand{\contactFullName}{Christian \textsc{Laguerre}}
+\newcommand{\contactEmail}{\href{mailto:Christian.Laguerre@math.cnrs.fr}{Christian.Laguerre@\-math.cnrs.fr}}
+\newcommand{\contactFS}{\href{mailto:fullswof.contact@listes.univ-orleans.fr}{fullswof.contact@listes.univ-orleans.fr}}
+\newcommand{\MainWebSite}{\url{https://sourcesup.renater.fr/projects/fullswof-2d/}} 
+\newtheorem{rmk}{Remark}
+
+% Headers and footers
+\lhead{\FullSWOF{} v\version}
+\rhead{MAPMO}
+\cfoot{\thepage /\pageref{LastPage}}
+\pagestyle{fancy}
+
+% Lists: no spacing between items
+\setlist{noitemsep}
+
+
+\title{Documentation of \FullSWOF \\v\version}
+
+\author{\contactFullName, \contactEmail}
+\date{2016-02-10} % Last modif for the documentation
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy}
+
+\tableofcontents
+
+\section{Presentation of the \FullSWOF{} software}
+
+The name \FullSWOF{} stands for ``Full Shallow Water equations for Overland Flow in two 
+dimensions of space''. In this software, the Shallow Water (or Saint-Venant) equations are solved 
+using finite volumes and numerical methods especially chosen for hydrodynamic purposes 
+(transitions between wet and dry areas, small water heights, steady-state preservation ...).
+A graphic user interface is available at \url{https://sourcesup.renater.fr/projects/fullswof-ui/}.
+
+For explanations concerning the numerical schemes 
+and approximations, the reader is referred to \cite{Delestre14}, \cite{Delestre10b}, \cite{Delestre09} and \cite{DelestreJames09}.
+For a precise description of the structure of the software in several classes, see the Doxygen file (refman.pdf in the \textit{doc} directory) and~\cite{Delestre08}. 
+The structure  of the source code is designed to make future evolutions easy: for example, a new friction law can easily 
+be added in the libfriction library, by creating a new friction file.
+
+If you plan to change the code of \FullSWOF, 
+see Section~\ref{sec:dvp} for explanations on how to use the benchmarks.
+Doing so, you should pay attention to the license (section~\ref{sec:license})
+
+\section{Software distribution}
+
+\subsection{How to download \FullSWOF?}
+The \FullSWOF{} software can be downloaded on the website \MainWebSite.
+
+\subsection{License}\label{sec:license}
+This software is distributed under CeCILL-V2 (GPL compatible) free software license. So, you are  authorized to use the Software, without any limitation as to its fields of application.
+
+If you make changes to \FullSWOF{} code, you are welcome to \textbf{contribute your changes to the main repository}, directly through the website (\MainWebSite) or by contacting its main developers (\contactFS).
+You may prefer to distribute yourself the \emph{Modified Software}. In such a case, we ask you to \textbf{change its name} in order to avoid confusion between your software and the original one. In such a case, pay attention to the text that follows.
+
+The license authorizes you to distribute the \emph{Modified Software}, in source code or object code form, provided that said distribution complies with all the provisions of the \emph{Agreement} and is accompanied by:
+\begin{itemize}
+\item a copy of the Agreement,
+\item a notice relating to the limitation of both the Licensor's warranty and liability,
+\end{itemize}
+and that, in the event that only the object code of the \emph{Modified Software is redistributed}, you allows future users \emph{access to the full source code of the Modified Software by indicating how to access it}, it being understood that the additional cost of acquiring the source code shall not exceed the cost of transferring the data.
+
+For further explanation about this free software license, you should read the following links:
+\begin{itemize}
+\item \url{http://www.cecill.info/licences/Licence\_CeCILL\_V2-fr.html} (in French)
+\item \url{http://www.cecill.info/licences/Licence\_CeCILL\_V2-en.html} (in English)
+\end{itemize}
+
+\subsection{Installation}
+\begin{rmk}
+To windows' users: please, look at the application note entitled ``\href{https://sourcesup.renater.fr/docman/view.php/895/3949/AppNote-windows.pdf}{Using Cygwin to compile and run  \emph{FullSWOF\_1D}, \FullSWOF{} or \emph{SWASHES} under windows}''.
+\end{rmk}
+
+First unzip the archive of the software. 
+When you are in the \FullSWOF{} directory, write the following lines:\\
+\verb!make cleanall!\\
+\verb!make!\\
+For the first tests, you can use the \textit{Exp01} directory, where you will find examples of inputs files:
+\verb!cd Exp01!\\
+\verb!../bin/FullSWOF_2D !
+
+\subsection{Check for proper functioning}\label{sec:functionOK}
+\FullSWOF{} comes with a set of test cases used for benchmarking (see section~\ref{sec:valid}). Each test case has its own directory, which initially contains:
+\begin{itemize}
+\item the analytic solution (file analytic.dat),
+\item the \FullSWOF{} input parameters (Inputs directory)
+\item the benchmark outcome as computed by the developers (files comp\_STANDARD\_32bits.dat and comp\_STANDARD\_64bits.dat).
+\end{itemize}
+Once the software is installed on your computer, it is worth checking its proper functioning. For this, simply run the command \verb!make benchref32! or \verb!make benchref64!
+(depending if your operating system is 32 or 64 bits).
+This will first compute all the test cases (the results of the computation will be stored in the Outputs\_REFERENCES directories).
+Then, the differences with the analytic solutions will be computed and, finally, it will be checked if they are differences between your run and the one of the developers. 
+It is expected no such difference will be found: hence, for each test case, you should get the diagnosis ``Results are identical.''.
+Otherwise, please, contact the developers at {\href{mailto:fullswof.contact@listes.univ-orleans.fr}{fullswof.contact@listes.univ-orleans.fr}}.
+
+\section{Input and output values}
+\begin{rmk}
+\FullSWOFUI{}, a graphic user interface dedicated to \FullSWOF{}, is available at 
+\url{https://sourcesup.renater.fr/projects/fullswof-ui/}.
+\end{rmk}
+
+When launched, \FullSWOF{} expects two subdirectories: one for the inputs, one for the outputs. 
+In the following sections, the notation \texttt{<x>} stands for the tag corresponding
+to the $x$ variable, whereas the square brackets [$\cdot$] give the unit of the variable.  
+
+\subsection{\emph{Inputs} directory}
+
+You can set the values of most of parameters in the \textit{parameters.txt} file, located in the \textit{Inputs} directory (the values we advise 
+to use for overland flow can be found in Section~\ref{rem:default}).
+
+\subsubsection{Space and time scales}
+
+First, you have to specify the \textbf{number of grid cells} \texttt{<Nxcell>} and \texttt{<Nycell>} (in space) and the \textbf{length of  the domain} along $x$ and $y$ (\texttt{<L>} [m] and \texttt{<l>} [m], respectively).
+For the time, you should set the value of the \textbf{duration of the simulation} \texttt{<T>} [s] and the \textbf{number of times saved} \texttt{<nbtimes>}
+(that is the number of pictures you will save to see the evolution as a movie). \\
+If you do not want to save pictures, you can set \texttt{<nbtimes>} to 0.\\
+
+You can run \FullSWOF{} either with a \textbf{constant CFL} \texttt{<cflfix>} or with \textbf{constant time step} \texttt{<dtfix>}.
+The type of time constraint is defined by \texttt<scheme\_type>. You can choose either:
+\begin{itemize}
+\item case 1: fixed CFL value. You only have to specify the value of \texttt{<cflfix>}. Usually, a CFL value equal to 0.4 is suitable.
+\item case 2: fixed time step (in seconds). In this case, you have to specify the values of both \texttt{<dtfix>} and \texttt{<cflfix>}.
+\end{itemize}
+Indeed, it is always necessary to set a CFL value even if you choose the fixed time step because FullSWOF{} verifies at each loop in time that the time step is not greater than this CFL value in order to respect the stability condition.
+
+\subsubsection{Boundary conditions}
+
+For some boundary conditions, you may have to specify the discharge and the water height on the boundary. 
+You must use the following principles:
+\begin{description}
+	\item[Imposed discharges] \sloppy \texttt{<left\_imp\_discharge>}, \texttt{<right\_imp\_discharge>}, \texttt{<bottom\_imp\_discharge>} and \texttt{<top\_imp\_discharge>} [$\rm m^{3}/s$] correspond to the discharges at the left, right, bottom and top boundaries, respectively.
+		At the left (\textit{i.e.} $x=0$) and bottom (\textit{i.e.} $y=0$) boundaries, if you want an incoming flow, you have to impose a positive discharge whereas for an outgoing flow 
+		you must impose a \textit{negative} discharge. \\At the opposite boundaries (\textit{i.e.} $x=x_{max}$ and $y=y_{max}$), impose a \textit{negative} discharge 
+		for the inflow and a positive discharge for the outflow;
+	\item[Imposed water heights] \texttt{<left\_imp\_h>}, \texttt{<right\_imp\_h>}, \texttt{<bottom\_imp\_h>} and \texttt{<top\_imp\_h>} [m] correspond to the water heights at the left, right, bottom and top boundaries respectively.
+\end{description}
+You must choose the \textbf{left, right, top} and \textbf{bottom boundary conditions} (\texttt{<Lbound>},
+\texttt{<Rbound>}, \texttt{<Tbound>} and \texttt{<Bbound>}):
+\begin{itemize}
+	\item the case 1 corresponds to the imposed height boundary condition (based on the modified method of characteristics).
+		\textbf{Imposed discharge and water height} have to be specified.
+		Depending on the regime (sub/super-critical) and on the boundary (inflow/outflow), the value of the imposed discharge may not be used by \FullSWOF;
+	\item the case 2 is for the wall condition; 
+	\item the case 3 is for the Neumann boundary condition, which means that the normal derivatives of the water height and velocity are null. 
+		Physically, this case represents an open boundary;
+	\item the case 4 stands for the periodic case, in which the outflow on one boundary is considered as the inflow on the other boundary. In this case, at each time step, 
+the incoming flow is set equal to the outgoing flow;
+	\item in case 5, the value of the discharge is imposed. You must specify the \textbf{value of flow discharge} and the \textbf{specific water height}, but
+  the latter will be considered only in supercritical cases.
+\end{itemize}
+
+
+\subsubsection{Friction law}
+You have to impose the \textbf{friction law} \texttt{<fric>}. You can use either:
+\begin{itemize}
+\item case 0 to run \FullSWOF{} with no friction.
+\item case 1 to use the Manning law; in this case, the friction coefficient is the Manning friction coefficient [$\rm m^{-1/3}s$]. 
+\item case 2 to choose the Darcy-Weisbach law; for this choice, the friction coefficient is the Darcy-Weisbach friction coefficient [dimensionless].
+\item case 3 to use the laminar law; in this case, the friction coefficient [$\rm m^{2}/s$] is the laminar friction coefficient,
+equal to the triple of the kinematic viscosity $\nu$.
+\end{itemize}
+If you choose case~1, case~2 or case~3, the value of the friction coefficient must be imposed either by using a file or by giving a value, according to the parameter \texttt{<fric\_init>}:
+\begin{itemize}
+\item case 1 to load the friction coefficient from a file. The file name is specified by the parameter \texttt{<fric\_NF>}. This file must be in the \textit{Inputs} directory. It should be in ASCII, in the format ``$x$ $y$ $f$'' in which $x$ represents the coordinate along $x$, $y$ represents the coordinate along $y$ and $f$ represents the friction coefficient.
+\item case 2 to use a constant friction coefficient over the whole domain. This value is set by the parameter \texttt{<friccoef>}.
+\end{itemize}
+\begin{rmk}
+For a spatially variable friction coefficient, if the variation is too important (in particular if a discontinuity occurs), 
+numerical errors such as spurious peaks may appear. 
+A possible way to overcome this problem is to implement a well-balanced scheme for the friction source term, see for example~\cite{Bouchut04}. 
+\end{rmk}
+
+\subsubsection{Numerical scheme}
+The next six parameters are related to the numerical scheme. You have to choose the:
+\begin{description}
+	\item[Numerical flux \texttt{<flux>}.] You can use either:
+		\begin{itemize}
+			\item case 1: Rusanov flux,
+			\item case 2: HLL (Harten, Lax and Van Leer) flux,
+			\item case 3: HLL2 flux, that is another way of programming HLL (unusual formulation but quicker resolution),
+                        \item case 4: HLLC (Harten, Lax and Van Leer with Contact Surface) flux,
+			\item case 5: HLLC2 flux, that is another way of programming HLLC (unusual formulation but quicker resolution).
+
+		\end{itemize}
+                \begin{rmk}
+                  The HLLC approximate Riemann solver is a modification of the basic HLL scheme to account for the influence of intermediate waves. Indeed, the HLLC solver restores the missing contact and shear waves in the HLL scheme.                  
+                \end{rmk}
+
+	\item[Order of the scheme\texttt{<order>}.] You can use either:
+		\begin{itemize}
+			\item case 1: order 1,
+			\item case 2: order 2.
+		\end{itemize}
+	\item[Linear reconstruction \texttt{<rec>}.] This parameter will play a role only for a scheme of order~2.
+It can be:
+		\begin{itemize}
+			\item case 1: MUSCL,
+			\item case 2: ENO,
+			\item case 3: a modified ENO.
+		\end{itemize}
+	\item[\texttt{<armortENO>}.] This parameter must be specified when you are using linear reconstructions ENO or modified ENO.
+	Its value must be between 0 and 1 (usually set to 0.25).  
+	If you take 0, it will be equivalent to choose the MUSCL reconstruction;
+	if \texttt{<armortENO>} is set equal to 1, the reconstruction will be exactly ENO or modified ENO,
+	depending on your previous choice.  
+	\item[\texttt{<modifENO>}.] For the modified ENO reconstruction, you have to set the \texttt{<modifENO>} parameter between 0 and 1, usually taken equal to 0.9.   
+	\item[Slope limiter \texttt{<lim>}.] This parameter will play a role only for a scheme of order~2.
+	You can use either: 
+		\begin{itemize}
+			\item case 1: the classical minmod slope limiter.
+			\item case 2: the more complicated expression of Van Albada.
+			\item case 3: Van Leer's reconstruction. 
+		\end{itemize}
+\end{description}
+
+\subsubsection{Infiltration}
+
+In this version of \FullSWOF, a modified bi-layer Green-Ampt is the only infiltration model (see~\cite{Esteves00}).
+So, you have the choice between:
+\begin{itemize}
+\item case 0 to run \FullSWOF{} without infiltration. 
+\item case 1: a modified bi-layer Green-Ampt infiltration model.\\
+For each infiltration parameter you can either initialize it from a file or give constant value.\\
+If you choose to parameterize the infiltration using files, you can include a spatial variability of the infiltration parameters. For this, you have to provide ASCII files in the format ``$x$ $y$ $w$'' and these files must be in the \textit{Inputs} directory.\\
+The modified bi-layer Green-Ampt infiltration model assumes the soil to be represented by two layers:
+\begin{description}
+\item[The first layer] (top of the surface) represents a crust of \textbf{thickness} \texttt{<zcrust>} [m] and \textbf{hydraulic conductivity} \texttt{<Kc>} [m/s].\\
+If you want to initialize these two parameters from a file, write the \textbf{name of the thickness file} in \texttt{<zcrust\_NF>} and/or the \textbf{name of your hydraulic conductivity file} in \texttt{<Kc\_NF>}.
+\item[The second layer] has a \textbf{saturated hydraulic conductivity} \texttt{<Ks>} [m/s].\\ 
+If you want to initialize this parameter from a file, write the \textbf{name of your saturated hydraulic conductivity file} in \texttt{<Ks\_NF>}.
+\end{description}
+The other parameters (common values for the two layers) are:
+\begin{itemize}
+	\item the \textbf{saturated moisture content} \textbf{$\theta_s$} \texttt{<dtheta>} [dimensionless] between 0 (dry) and 1 (fully saturated).\\
+          If you want to initialize this parameter from a file, write the \textbf{name of your saturated moisture content file} in \texttt{<dtheta\_NF>}.
+	\item the \textbf{load pressure} \textbf{$\psi$} \texttt{<Psi>} [m].\\
+          If you want to initialize this parameter from a file, write the \textbf{name of your load pressure file} in \texttt{<Psi\_NF>}.
+	\item the \textbf{maximum infiltration rate} $i_{max}$ \texttt{<imax>} [m/s].  In the standard Green-Ampt model, at $t=0$ s, if the cumulative volume of water infiltrated is zero, the infiltration capacity is infinite. To avoid this phenomena, the Green-Ampt model has been modified to be able to impose a maximum infiltration rate $i_{max}$.\\
+         If you want to initialize this parameter from a file, write the \textbf{name of maximum infiltration rate file} in \texttt{<imax\_NF>}.
+
+\end{itemize}
+\end{itemize}
+
+\subsubsection{Topography}
+The type of input is defined by \texttt{<topo>} which can take the following values:
+\begin{itemize}
+	\item 1 to load the topography from a file. You have to enter the \textbf{topography} using an ASCII file you previously generated in the format  ``$x$ $y$ $z$''.
+	Write the \textbf{name of your topography file} in \texttt{<topo\_NF>}. This file must be in the \textit{Inputs} directory. 
+	\item 2 to use a flat topography with $z=0$; 
+	\item 3 to have the Thacker's paraboloid defined by $z=-0.1*(1-\sqrt{(x-x_m)^2+(y-y_m)^2})$ where $(x_m,y_m)$ is the center point of the computational domain. This is used for the benchmark shown in section~\ref{ThackerParabBench} and detailed in~\citep[§~4.2.2]{Delestre13}. 
+\end{itemize}
+\begin{rmk}
+\FullSWOF{} considers values (such as $h, u, v, z$) constant on a given cell, and the constant 
+is given in the center of the cell, see figures~\ref{fig:cells} and~\ref{fig:mesh}.
+\end{rmk}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{Figures_FullSWOF_2D/points-cells_2D}
+\caption{Piecewise approximation of 2D curves in \FullSWOF{}}
+\label{fig:cells}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=12cm]{Figures_FullSWOF_2D/Maillage_FullSWOF_2D}
+\caption{Mesh \FullSWOF;\protect\\ LB= Left Boundary, RB= Right Boundary, BB= Bottom Boundary, TB= Top Boundary.\newline \textcolor{red}{The computational domain} is represented by the \textcolor{red}{cells with the red center} and the \textcolor{blue}{boundary} corresponds to \textcolor{blue}{the cells with blue center}.}
+\label{fig:mesh}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Initial water height and velocity}
+You can impose the initial water height and velocity using \texttt{<huv\_init>}:
+\begin{itemize}
+	\item case 1 to load the initialization of variables $h$  [m], $u$ [m/s] (velocity in the $x$-direction) and $v$ [m/s] (velocity in the $y$-direction) from a file. This file must be in ASCII and follow the format
+``$x$ $y$ $h$ $u$ $v$''. The \textbf{name of the file} \texttt{<huv\_NF>} should be specified and this file must be in the \textit{Inputs} directory. 
+	\item case 2 to have $h=0$ m, $u=0$ m/s and $v=0$ m/s. 
+	\item case 3 to have the initialization for the paraboloid used as a benchmark in section~\ref{ThackerParabBench}
+and detailed in~\citep[§~4.2.2]{Delestre13}.\\
+You should choose the Thacker's topography for this case.
+	\item case 4 to have $h=0.005$~m in a disk centered at ($L/2,l/2$) (which is the middle of the computation domain $[0;L] \times [0; l]$) with a radius $L/10$. $h = 0$~m outside the disk, and $u = v = 0$~m/s on the whole domain. This case is used to simulate the dry radial dam break shown as a benchmark in 
+section~\ref{RadialDamDryBench} (Figure~\ref{fig:Radial_dam_dry})
+and detailed in~\citep[§~4.1.2]{Delestre13}).\\ 
+You should choose the flat topography for this case.
+	\item case 5 to have $h=0.005$~m in a disk centered at ($L/2,l/2$) (which is the middle of the computational domain $[0;L] \times [0; l]$) with a radius $L/10$. $h = 0.001$~m outside the disk, and $u = v = 0$~m/s on the whole domain.This case is used to simulate a wet radial dam (see Figure~\ref{fig:Radial_dam_wet}, and~\citep[§~4.1.1]{Delestre13}). \\
+You should choose the flat topography for this case.
+ \end{itemize}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{Figures_FullSWOF_2D/Radial_dam_dry}
+\caption{Initialization of $h$, $u$ and $v$ to simulate a dry radial dam:
+$h=0$ m or $h=0.005$ m, $u=0$ m/s, $v=0$ m/s.}
+\label{fig:Radial_dam_dry}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{Figures_FullSWOF_2D/Radial_dam_wet}
+\caption{Initialization of $h$, $u$ and $v$  to simulate a wet radial dam: 
+$h=0.001$ m or $h=0.005$ m, $u=0$ m/s, $v=0$ m/s.}
+\label{fig:Radial_dam_wet}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Rain}
+For the \textbf{rain} \texttt{<rain>}, you can use:
+\begin{itemize}
+\item case 0: \textbf{No Rain}.
+\item case 1: An ASCII file.
+  The \textbf{name of your rain file} \texttt{<rain\_NF>} should be set and this file must be in the \textit{Inputs} directory.\\
+  The file must contain two columns:
+  \begin{itemize}
+  \item the first one represents the time [s].
+  \item the second one the rain intensity [m/s].
+  \end{itemize}
+  Each column must contain at least one value.\\
+  In the first column, the first value must be 0 (initial time). If the file contains one value by column (namely 0 in the first column and any value in the second column), the rain intensity is constant during the run.\\
+  If the file contains several lines with different values, that means the rain intensity will be changed during the simulation.
+  For example, let us consider three values for the time ($0,t_1,t_2$) and the corresponding three values for the rain intensity ($a_0,a_1,a_2$) (written into the second column). Let us consider $Rain(t)$ the intensity of the rain at the time t, we will get the values:
+  $$Rain(t)=\left\{\begin{array}{rl}
+  {a_0} & \mbox{for }\; 0 \leq t < t_1,\\
+  {a_1} & \mbox{for }\; t_1 \leq t < t_2, \\
+  {a_2} & \mbox{for }\; t_2 \leq t. \end{array}\right.$$
+  \textbf{Be careful:} the intensity may not change exactly at $t=t_1$ but at $t > t_1$. Indeed, whether using a constant CFL or a constant time step, $t_1$ might not be reached exactly. We can have $t<t_1$ for a given computing time, and the next computing $t+dt$ may be greater than $t_1$. So, $t=t_1$ may not exist and the change in rain intensity will take place at $t+dt>t_1$.
+  
+\item case 2: the rain intensity is constant during the run. The value is equals to $10^{-5} $ m/s that is equivalent to $36$ mm/h.  
+\end{itemize}
+\begin{rmk}
+You can create another case from, for example, the function in the rain\_generated.cpp file (see the directory: Sources/librain\_infiltration/).
+\end{rmk}
+
+\subsubsection{Name of output directory}
+
+The default name of the output directory is \textit{Outputs}. However, you can add a \textbf{suffix} to this name (\texttt{<suffix\_o>}). This is especially useful if you are running several tests.
+
+\subsubsection{Format of the output files}
+You have the choice between two possibilities to save the evolution of the computed values:
+\begin{itemize}
+\item case 1: gnuplot format is designed for the gnuplot software\footnote{\url{http://www.gnuplot.info}}. This ASCII file can be used to draw easily the output using gnuplot software.
+\item case 2: vtk format can be used for the display of the computed values with Paraview software\footnote{\url{http://www.paraview.org}}. It is an ASCII file too.
+\end{itemize}
+
+\subsubsection{Comments}
+You can also add comments after the input value of each parameter. For  example:\\
+\verb!Time of simulation <T>:: 0.001 # try 0.01 next time!
+
+\subsubsection{Advised values}\label{rem:default}
+For overland flow, several tests have been performed, in particular on the numerical scheme~\cite{Delestre10b}. 
+Consequently, we advise the user to choose by default the following numerical parameters:
+\begin{itemize}
+\item \texttt{Choice of type of scheme (1=fixed cfl  2=fixed dt) <scheme\_type>:: 1}
+\item \texttt{Value of the cfl  <cflfix>:: 0.4}
+\item \texttt{Numerical flux (1=Rus 2=HLL 3=HLL2 4=HLLC 5=HLLC2) <flux>:: 5}
+\item \texttt{Order of the scheme <order>:: 2}
+\item \texttt{Reconstruction (1=MUSCL 2=ENO 3=ENOmod) <rec>:: 1}
+\item \texttt{Limiter (1=Minmod 2=VanAlbada 3=VanLeer) <lim>:: 1}
+\end{itemize}
+
+If you choose the ENO or the modified ENO reconstruction, you should use:
+\begin{itemize}
+\item \texttt{AmortENO <amortENO>:: 0.25}
+\item \texttt{ModifENO <modifENO>:: 0.9}
+\end{itemize}
+
+\subsection{\emph{Outputs} directory}\label{sec:outputs}
+
+The results are saved in the \textit{Outputs} directory. When starting the program, the following files are saved:
+\begin{description}
+	\item[\textbf{parameters.dat}] contains the parameters used by \FullSWOF, under the same format as the input file. In this file, the value of parameters will be empty or equal to zero if the user did not fill them in parameters.txt file. 
+	\item[\textbf{huz\_initial.dat}] contains the initial conditions (water height, velocity, topography and free surface).
+\end{description}
+%According to the running mode some files are modified in order to save several time steps.\\
+During the computation, one file is modified in order to save several time steps:
+\begin{description}
+	\item[\textbf{huz\_evolution.dat}] contains the evolution (in time) of the main variables on each cell (water height, velocity, free surface, topography, the Euclidean norm of the velocity, Froude number, discharge along $x$, discharge along $y$, the Euclidean norm of the discharge).
+	There are \texttt{<nbtimes>} time steps saved.\\
+	If you set \texttt{<nbtimes>} to 0, \FullSWOF{} will not create the \textbf{huz\_evolution.dat} file.
+\end{description}
+
+If the software did not stop before (meaning, in case of running with a fixed dt, the CFL maximum value has been reached, which implies that you must decrease the time step or increase the space step), 
+the computation is done until the final time, and two other files are created:
+\begin{description}
+	\item[\textbf{huz\_final.dat}] contains the main variables on each cell (water height, velocity, free surface, topography, the Euclidean norm of the velocity, Froude number, discharge along $x$, discharge along $y$, the Euclidean norm of the discharge) at the final time.
+	\item[\textbf{results.dat}] contains a mass balance to check the scheme conservation at the final time.
+	More precisely, you get:
+	\begin{itemize}
+		\item Infiltrated volume [$m^3$] is the total infiltrated water volume cumulated during the simulation. 
+		\item Stream volume [$m^3$] is the total water volume staying at the final time above topography. 
+		\item Complete volume (Inf+Stream) [$m^3$] is the sum of infiltrated volume and stream volume.
+		\item Volume of the rain [$m^3$] is the total rain volume cumulated during the simulation. 
+		\item Outflow volume [$m^3$] is the sum of the cumulated outflow volume at all boundaries. 
+		\item Duration of the computation [s]. 
+		\item Number of iterations in the algorithm [dimensionless]. 
+		\item Mean Froude number [dimensionless] in space at the final time. 
+	\end{itemize}
+\end{description}
+
+Finally, if you ran \FullSWOF{} in debug mode (see Section~\ref{sec:debug}), four other files are saved:
+\begin{description}
+	\item[\textbf{check\_vol.dat}] contains the cumulated volumes [$m^3$] at each time step. 
+The first column is the time and the others are:
+the overland flow volume (Vol\_of\_tot), the infiltrated volume (Vol\_inf\_tot), the rain volume (Vol\_rain\_tot) and the balance of the input and output volumes at the boundaries (Vol\_bound\_tot).\\
+Recall that the second order is computed thanks to a prediction-correction method. Hence, when the code is run at the second order, two fluxes are used to perform one time step.
+In this case, the two values printed at $t^n$ are the cumulated volumes associated with the two fluxes used to compute the values at $t^{n+1}$.
+	\item[\textbf{boundaries\_flux.dat}] contains the cumulated fluxes [$m^2$] for each boundary and at each time step.
+When the code is run at the second order, two fluxes are used to perform one time step.
+In this case, the two values printed at $t^n$ are the cumulated fluxes associated with the two fluxes used to compute the values at $t^{n+1}$. 
+	\item[\textbf{flux\_boundaries\_LR.dat}] contains the fluxes [$m^2/s$] calculated at each cell of the left and right boundaries.
+When the code is run at the second order, the two values printed at $t^n$ are the two fluxes used to compute the values at $t^{n+1}$.
+	\item[\textbf{flux\_boundaries\_BT.dat}] contains the fluxes [$m^2/s$] calculated at each cell of the bottom and top boundaries. 
+Here again, when  the code is run at the second order, the two values printed at $t^n$  are the two fluxes used to compute the values at $t^{n+1}$.
+\end{description}
+
+\section{For developers}\label{sec:dvp}
+
+\subsection{Debugging}\label{sec:debug}
+
+If you make some changes in \FullSWOF{}, you will need to debug your code. 
+The default configuration is the release mode. To change it into debug mode, you must set the 
+\texttt{DEBUG} value to \texttt{yes} in the \textbf{make\_config} file. In that case, additional output
+files will be created to help you in your tests (see Section~\ref{sec:outputs}).
+
+\subsection{Check for performances}
+
+\sloppy
+\FullSWOF{} comes with a set of test cases used for benchmarking (see section~\ref{sec:valid}). Each test case has its own directory, which should contains:
+\begin{itemize}
+\item the analytic solution (file analytic.dat),
+\item the \FullSWOF{} input parameters (Inputs directory),
+\item the benchmark outcome as computed by the developers (files comp\_STANDARD\_32bits.dat and comp\_STANDARD\_64bits.dat),
+\item the benchmark outcome as computed on your computer after installation (file comp\_REFERENCES.dat) --- see section~\ref{sec:functionOK}.
+\end{itemize}
+
+After you modify \FullSWOF{} code, you may want to check if the performances are the same, have been degraded (a bug?), or have been improved, compared to the capabilities of the software after installation. 
+For this, simply run the command \verb!make bench32! or \verb!make bench64! (depending if your operating system is 32 or 64 bits).
+This will first compute all the test cases (the results of the computation will be stored in the Outputs directories).
+Then, the differences with the analytic solutions will be computed and, finally it will be checked if they are differences between your current run and 
+the run upon installation.
+
+\begin{rmk}
+If, at some point, you do not want to compare the performances with the run upon installation anymore, you should delete the files comp\_REFERENCES.dat and the directories
+Outputs\_REFERENCES. Then, run \verb!make benchref32! or \verb!make benchref64! (depending if your operating system is 32 or 64 bits).
+The newly created comp\_REFERENCES.dat file and Outputs\_REFERENCES directories will be then used as references when using \verb!make bench32! or \verb!make bench64!.
+\end{rmk}
+
+If there is no difference, you should get the diagnosis ``Results are identical.'' for each test case.
+
+If differences are reported for one or more test cases, you may first want to look at the files diff\_REF\_USER.dat of the relevant test cases). After the header (lines starting with the \# character), are listed a set of values:
+\begin{description}
+\item[The first column identifies the variable.] DhSI stands for ``Differences in water height in international system unit'' (meter in the case of water height) while Dh\% stands for ``Differences in water height expressed as a percentage'' (taking as a reference the case Outputs\_REFERENCES). Differences in velocity starts with ``Du'' and differences in water flux starts with ``Dq''.
+\item[The second column identifies the statistics for each variable.] First is given the number of differences that cannot be computed (``nbdiff==NaN''), probably because it involves a division by zero. Then the number of differences equal to zero, larger than zero and smaller than zero. Following are the minimum, maximum, mean and median values, and finally the $L^1$, $L^2$ and $L^\infty$ norms.
+\item[The third column shows the absolute differences.] 
+\item[The fourth column shows the relative differences (as a percentage),] taking as a reference the case Outputs\_REFERENCES.
+\end{description}
+So, you should be able to identify if the differences concern numerous values (or just a few), and if they are about water height, velocity or flux. At this stage in the diagnosis, it may be time to dig further by comparing the content of the Outputs and Outputs\_REFERENCES directories:
+\begin{itemize}
+\item First, check for uncalled-for differences in the parameter.dat files. 
+\item Check that the initial data are identical (files huz\_initial.dat).
+\item Locate the differences in the final results by comparing the files huz\_final.dat.
+\item Eventually, compare the time evolution of these differences (files huz\_evolution.dat).
+\end{itemize}
+Based on this, you should be able to evaluate if the software results are as accurate, more accurate or less accurate than before. Since each test case addresses specific flow conditions (see section~\ref{sec:valid}), you should be able to build a rationale about which part of the simulation has been impacted, and, if required, which part of the source code is involved.
+\fussy
+
+
+\subsection{Doxygen}
+You may wish to add some functionalities to \FullSWOF{} to suits your needs.
+Always comment the files, at the beginning of the file, using Doxygen syntax (\url{http://www.doxygen.org}).
+Then, you will be able to create the Doxygen documentation of the whole code.
+\begin{description}
+	\item[HTML documentation.]
+		\sloppy In order to generate the Doxygen html file, the \textbf{Doxygen\_config\_file\_html} file is saved in the \emph{doc} directory.
+		To run Doxygen, from the \FullSWOF{} directory, use the command:\\
+		\texttt{doxygen doc/Doxygen\_config\_file\_html}\\
+		Warning: Graphviz (\url{http://www.graphviz.org/}) must be in your PATH to generate HTML diagrams.
+		If not, change the HAVE\_DOT parameter of the Doxygen\_config\_file\_html file.
+		In the \emph{doc/html/} directory, \textbf{index.html} is created.
+	\item[PDF documentation.]
+		To generate the Doxygen PDF file (using \LaTeX{}), you must use the \textbf{Doxygen\_config\_file\_latex} file and compile the .tex file:\\
+		\texttt{doxygen doc/Doxygen\_config\_file\_latex}\\
+		\texttt{cd doc/latex}\\
+		\texttt{make}\\
+		In the \emph{doc/latex} directory, \textbf{refman.pdf} is created.
+\end{description}
+Your version of Doxygen should be 1.8.7 or greater.
+
+\begin{rmk}
+To simplify these operations, you can run the script UpdateDateVersion located in the bin folder.
+\end{rmk}
+
+\section{Validation}\label{sec:valid}
+
+This software has been validated using several analytic solutions and benchmarks
+from the literature, gathered in~\cite{Delestre13} and in the SWASHES software (\url{https://sourcesup.renater.fr/projects/swashes/}).
+Some of them are already configured in the \textbf{Benchmarks} directory. 
+
+In this documentation, we recall the main characteristics of these tests, and give the results of \FullSWOF.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Steady-state solutions}
+
+In this section, we focus on a family of steady-state solutions, that are solutions satisfying:
+\begin{equation*}
+ \partial_t h=\partial_t u=\partial_t v=0.
+\end{equation*}
+
+\subsubsection{Emerged bump at rest}
+
+Here we present a steady-state case (see~\citep[§~3.1.2]{Delestre13}) with a flat topography at the boundaries, no rain, no friction and no diffusion.
+Initial conditions satisfy the hydrostatic equilibrium
+\begin{equation}
+  h+z=Cst\;\text{and}\;q=0~\text{m}^2/\text{s}.\label{hydeq}
+\end{equation}
+This solution tests the preservation of steady state and the boundary condition treatment.
+
+\medskip
+
+In the following case, we choose a domain of length $L = $~25~m with a topography given by:
+\begin{equation*}
+z(x,y) = \max\left(0\; , 0.2-0.05(x-10)^2-0.1(y-10)^2\right)
+\end{equation*}
+
+The water height is smaller than the topography height
+in order to have emergence of some parts of the bump.   
+In such a configuration, starting from the steady state, the velocity must be null and the water surface should stay flat (see Figure~\ref{FigBumpemerged}).
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/Bump_emerged_Lake_at_rest_h}\ \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/Bump_emerged_Lake_at_rest_q}
+	\caption{Emerged bump at rest}
+	\label{FigBumpemerged}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Fluvial Mac Donald test with rain and Darcy-Weisbach friction coefficient}
+For a 1000~m long channel, we consider a flow which is fluvial on the whole domain (see Figure~\ref{FigRain_flu} and~\citep[§~3.3.1]{Delestre13}). Thus we impose a constant discharge ($q=1\;\text{m}^2/\text{s}$) at the inflow and a constant water height at the outflow.\\
+Initially, the channel is dry and we choose Darcy-Weisbach friction law with $f=0.093$. We also impose a constant rain intensity ($R_{0} = 0.001$~m/s) during the simulation.
+%\begin{equation*}
+% \left\{\begin{array}{l}
+%   \text{upstream:}\;q=q_0,\\
+%   \text{downstream:}\;h=h_{ex}(1000),
+% \end{array}\right.
+%\end{equation*}
+%with the initial conditions 
+%$$ h = 0~\text{m} \mbox{ and } q=0~\text{m}^2/\text{s}.$$
+
+%For the friction term, we have chosen Darcy-Weisbach's law with $f=0.093$, 
+% the discharge $q_{0}$ is set at $1~\text{m}^2/\text{s}$ and the rain intensity is $R_{0} = 0.001$~m/s.
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDo_rain_flu_DW_h}\ \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDo_rain_flu_DW_q}
+	\caption{Fluvial MacDonald Rain test with Darcy-Weisbach friction coefficient}
+	\label{FigRain_flu}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Torrential Mac Donald test with rain and Darcy-Weisbach friction coefficient}
+The channel length remains unchanged (1000~m), but, as the flow is supercritical, we consider constant discharge ($q=2.5\;\text{m}^2/\text{s}$) and water height at the inflow and a free outflow (see Figure~\ref{FigRain_tor} and~\citep[§~3.3.1]{Delestre13}).
+At initial time, the channel is dry and we choose Darcy-Weisbach friction law with $f=0.065$.\\
+%\begin{equation*}
+% \left\{\begin{array}{l}
+%   \text{upstream:}\;q = q_{0} \mbox{ and } h=h_{ex}(0),\\
+%   \text{downstream: free.}
+% \end{array}\right.
+%\end{equation*}
+
+%$$ h = 0~\text{m} \mbox{ and } q=0~\text{m}^2/\text{s}.$$
+
+In this benchmark, there is no rain until 1500~s and after the rain intensity is $0.001$~m/s until the end.
+%The general form of the used rainfall event is
+%\begin{equation*}
+%R(t)=\left\{\begin{array}{ll}
+%         0 \text{ m/s}    &  \text{if}\;t<t_{R},\\
+%  R_{0}   &  \text{else},
+%        \end{array}\right.
+%\end{equation*}
+%with $t_{R} = 1500$~s.\\ 
+
+%We have a friction coefficient $f = 0.065$ for Darcy-Weisbach's law. Inflow
+% discharge is $q_0=2.5\;\text{m}^2/\text{s}$ and $R_{0} = 0.001$~m/s (see Figure~\ref{FigRain_tor}).
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDo_rain_tor_DW_h}\ \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDo_rain_tor_DW_q}
+	\caption{Torrential MacDonald: Rain test with Darcy-Weisbach friction coefficient}
+	\label{FigRain_tor}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Mac Donald test with smooth transition and shock, with Manning friction coefficient}
+               
+The length of the channel is $100$ m and the discharge at steady state is $q=2 \;\text{m}^2/\text{s}$. The flow
+ is fluvial both upstream and downstream (see Figure~\ref{FigMacDosmoothtrans} and~\citep[§~3.2.2]{Delestre13}).
+In this case, the Manning friction coefficient is $n = 0.0328$~m\textsuperscript{-1/3}s, the inflow is subcritical,
+becomes supercritical via a sonic point, and, through a shock (located at $x=200/3 \approx 66.67$~m), becomes subcritical again.
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDo_tor_flu_tor_Man_h}\ \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDo_tor_flu_tor_Man_q}
+	\caption{Mac Donald test with smooth transition and shock, with Manning friction coefficient}
+	\label{FigMacDosmoothtrans}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Mac Donald pseudo-2D solutions}
+In this section, we give several analytic solutions for the pseudo-2D Shallow-Water system (see~\citep[§~3.5]{Delestre13}). 
+This system can be considered as an intermediate between the one-dimensional and the two-dimensional models. 
+More precisely, these equations model a flow in a rectilinear three-di\-men\-sional channel
+with the quantities averaged not only on the vertical direction but also on the width of the channel.
+
+We consider two cases for non-prismatic channels. Each channel is determined through the definition of the bottom width $B$ (as a function of the space variable $x$) and the slope of the boundary $Z$.
+The bed slope is an explicit function of the water height.
+
+\paragraph{Torrential Mac Donald pseudo-2D test with Manning friction coefficient}
+In this case, the flow ($q=20\text{ m}^3 \text{s}^{-1}$) and the water height are set at the inflow whereas the outflow is free (see Figure~\ref{Figpseudo2D_tor} and~\citep[§~3.5.2]{Delestre13}).\\
+The channel is initially dry and the flow is supercritical during the simulation. 
+% We have the following boundary conditions:
+%\begin{equation*}
+%  \left\{\begin{array}{l} 
+%     \text{upstream:}\;q=20\text{ m}^3 \text{s}^{-1}\; \text{and}\; h=h_{in},\\
+%     \text{downstream: free.}
+%  \end{array}\right.
+%\end{equation*}
+
+%The channel is initially dry, \emph{i.e.} initial conditions are:
+%\begin{equation*}
+%  h=0\text{ m},\;\text{and}\;q=0\;\text{m}^3/\text{s}.
+%\end{equation*}
+
+%In this case, the flow is supercritical.
+\begin{figure}[htbp]
+  \begin{center}
+	\includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDoP2D_tor_Man_h} 
+	\caption{Torrential Mac Donald  pseudo 2D test with Manning friction coefficient}
+	\label{Figpseudo2D_tor}
+  \end{center}
+\end{figure}
+
+\paragraph{Fluvial Mac Donald pseudo-2D test with Manning friction coefficient}
+Now, the length of the domain is $L = 400$~m, the boundaries of the channel are given by $B_{2}$ and the cross sections are isoscele trapezoids (see Figure~\ref{Figpseudo2D_flu_b2} and~\citep[§~3.5.5]{Delestre13}).
+
+In this case, the flow is imposed at the inflow ($q=20\text{ m}^3 \text{s}^{-1}$) and the water height is prescribed at the outflow (see Figure~\ref{Figpseudo2D_flu}). The flow is subcritical along the whole channel.
+% We have the following boundary conditions:
+%\begin{equation*}
+%  \left\{\begin{array}{l}
+%     \text{upstream:}\;q=20\text{ m}^3 \text{s}^{-1},\\
+%     \text{downstream:}\;h=h_{out}.
+%  \end{array}\right.
+% \end{equation*}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDonald_b2}
+    \caption{Function B2 for the shape of the channel in the fluvial Mac Donald pseudo-2D test.}
+    \label{Figpseudo2D_flu_b2}
+  \end{center}
+\end{figure}
+
+The channel is initially dry, with a little puddle downstream.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/MacDoP2D_flu_Man_h}
+    \caption{Fluvial Mac Donald  pseudo 2D test with Manning friction coefficient}
+    \label{Figpseudo2D_flu}
+  \end{center}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Transitory solutions}
+
+In the previous section, we gave steady-state solutions of increasing difficulties.
+These solutions can be used to check if the numerical methods are able to keep/catch steady-state flows.
+But even if the initial condition differs from the expected steady-state,
+we do not have information about the transitory behavior.
+Thus, in this section, we give some transitory solutions that may improve the validation of the numerical methods.
+Moreover, as these cases have wet/dry transitions,
+one can check the ability of the schemes to capture the evolution of these fronts
+(\emph{e.g.} some methods may fail and give negative water height). At last, we give a periodic transitory solution in order to
+check whether the schemes are numerically diffusive or not.
+
+\subsubsection{Dam break on a dry domain without friction}
+\label{RadialDamDryBench}
+In this section, we are interested in a dam break solution on a flat topography namely Ritter's solution
+(see~\citep[§~4.1.2]{Delestre13}).
+The initial condition for this configuration is the following Riemann problem
+$$h(x,y)= \begin{cases}
+  0.005 & \mbox{ for }0\mbox{ m}\leq y \leq L-x ,\\
+  0 & \mbox{  for } y > L-x,
+\end{cases}$$ with  $u(x,y)=v(x,y)= 0$~m/s. The comparison between the solution given by \FullSWOF{} and analytic solution is shown in Figure~\ref{FigDambreak}.
+
+\begin{figure}[htbp]
+  \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/Dry_Dam_Break_h}\ \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/Dry_Dam_Break_q}
+  \caption{Dam break dry without friction}
+  \label{FigDambreak}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Thacker test case with planar surface in paraboloid}
+\label{ThackerParabBench}
+For this Thacker 2D case, the moving shoreline is a circle
+and the topography is a paraboloid of revolution. The free surface has a periodic motion and
+ remains planar in time (see~\citep[§~4.2.2]{Delestre13}).
+To visualize this case, one can think of a glass with some liquid in rotation inside (see Figure~\ref{FigThacker}). 
+
+Here again, the analytic solution at $t=0$~s is taken as initial condition.\\
+This is an analytic solution with a variable slope (in space) for which the wet/dry transitions are moving. 
+It also tests the ability of the schemes to simulate flow with comings and goings and, as the water height is
+periodic in time, the numerical diffusion of the scheme.
+\begin{figure}[htbp]
+	\includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/Thacker_planar_h}\ \includegraphics[width=0.48\textwidth]{Figures_FullSWOF_2D/Thacker_planar_q}
+	\caption{Thacker test case with planar surface in paraboloid}
+	\label{FigThacker}
+\end{figure}
+
+\bibliographystyle{plainnat}
+\bibliography{doc}
+
+\end{document}

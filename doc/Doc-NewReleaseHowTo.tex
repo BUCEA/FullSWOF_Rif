@@ -1,0 +1,753 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX spellcheck = en_US
+
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.4cm]{geometry} % warning: space added line 238. 
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{indentfirst}
+
+% Specific commands
+\newcommand{\FullSWOFnD}{\emph{FullSWOF\_1D/2D}}
+\newcommand{\FullSWOFoneD}{\emph{FullSWOF\_1D}}
+\newcommand{\FullSWOFtwoD}{\emph{FullSWOF\_2D}}
+\newcommand{\FullSWOFUI}{\emph{FullSWOF\_UI}}
+\newcommand{\SWASHES}{\emph{SWASHES}}
+\newcommand{\contactFullName}{Frédéric \textsc{Darboux}}
+\newcommand{\contactEmail}{\href{mailto:Frederic.Darboux@orleans.inra.fr}{Frederic.Darboux@orleans.inra.fr}}
+\newcommand{\contactFS}{\href{mailto:fullswof.contact@listes.univ-orleans.fr}{fullswof.contact@listes.univ-orleans.fr}}
+\newcommand{\contactSWASHES}{\href{mailto:swashes.contact@listes.univ-orleans.fr}{swashes.contact@listes.univ-orleans.fr}}
+\newcommand{\MainWebSiteFSoneD}{\url{https://sourcesup.renater.fr/projects/fullswof-1d/}}
+\newcommand{\MainWebSiteFStwoD}{\url{https://sourcesup.renater.fr/projects/fullswof-2d/}}
+\newcommand{\MainWebSiteFSUI}{\url{https://sourcesup.renater.fr/projects/fullswof-ui/}}
+\newcommand{\MainWebSiteSWASHES}{\url{https://sourcesup.renater.fr/projects/swashes/}}
+
+\renewcommand{\thesection}{\thepart .\arabic{section}}
+
+% Headers and footers
+\lhead{Releasing \FullSWOFnD{}, \FullSWOFUI{} or \SWASHES{}}
+\rhead{INRA-UR272-Sols --- MAPMO}
+\cfoot{\thepage /\pageref{LastPage}}
+\pagestyle{fancy}
+
+\def\thepart{\Alph{part}}
+
+% Lists: no spacing between items
+\setlist{noitemsep}
+
+\title{Documentation:\\
+Steps to release a new version of\\
+\FullSWOFoneD, \FullSWOFtwoD{}, \FullSWOFUI{} or \SWASHES{}.\\
+General release and Windows release}
+
+\author{\contactFullName, \contactEmail}
+\date{2014-04-29}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy}
+
+This document lists the steps to release a new version of \FullSWOFoneD, \FullSWOFtwoD{}, \FullSWOFUI{} or \SWASHES{}. The first part is related to the general release, \emph{i.e.}~the non-OS-specific packages. The second part describes the release of packages dedicated to Windows.
+
+For any question, please contact us at the following addresses: \contactFS{} or \contactSWASHES{}.
+
+\part{For general release}
+
+Releasing non-OS-specific packages for a new version of \FullSWOFoneD, \FullSWOFtwoD{}, \FullSWOFUI{} or \SWASHES{} requires a succession of operations using various tools. 
+This part details these steps.
+
+
+\section{From trunk to tag}
+
+\emph{Remark: it is assumed that you have already downloaded the subdirectories named trunk, tags and branches from the repository.}
+
+After thorough checks (esp. compilation and run of the benchmarks under various operating systems), it can be decided to release a new version of the software. A final revision change should be committed to SVN. It consists in: 
+\begin{enumerate}
+\item adding to the file trunk/changelog.txt something like:
+\begin{verbatim}
+2013-09-04
+READY FOR TAG version 1.04.04
+\end{verbatim}
+\item running the script UpdateDateVersion.sh  from the trunk directory with parameters such as
+\begin{verbatim}
+bin/UpdateDateVersion.sh 2013-09-04 1.04.04
+\end{verbatim}
+\item committing these changes to the SVN server:
+\begin{verbatim}
+svn commit -m "Ready for tag version 1.04.04"
+\end{verbatim}
+\item creating the tag:
+\begin{verbatim}
+svn copy https://subversion.renater.fr/fullswof-2d/trunk \
+         https://subversion.renater.fr/fullswof-2d/tags/release-1.04.04 \
+      -m "Tagging the 1.04.04 release of the FullSWOF_2D project."
+\end{verbatim}
+\end{enumerate}
+
+
+\section{From tag to package}
+
+\begin{enumerate}
+\item Move in the tags directory and do an update:
+\begin{verbatim}
+ cd tags/
+ svn update
+\end{verbatim}
+\item copy the relevant tag directory and give it the corresponding name:
+\begin{verbatim}
+mkdir FullSWOF_2D-1.04.04
+cp -r release-1.04.04/* FullSWOF_2D-1.04.04
+\end{verbatim}
+\item remove the .svn directories
+\begin{verbatim}
+find FullSWOF_2D-1.04.04 -name ".svn" -type d -exec rm -rf {} \;
+\end{verbatim}
+
+\item create the zip file for \FullSWOFoneD, \FullSWOFtwoD{},\FullSWOFUI{} and \SWASHES{}
+\begin{verbatim}
+zip -r FullSWOF_2D-1.04.04.zip FullSWOF_2D-1.04.04
+\end{verbatim}
+\item create a text file (\emph{e.g.}~comment.txt) with some info such as 
+\begin{verbatim}
+FullSWOF_2D release 1.04.04
+<https://sourcesup.renater.fr/projects/fullswof-2d/>
+\end{verbatim}
+\item add this info to the zip file
+\begin{verbatim}
+zip --archive-comment FullSWOF_2D-1.04.04.zip < comment.txt
+\end{verbatim}
+
+\color[gray]{0.4}
+\item in the case of \FullSWOFUI{}, create the jar file 
+
+\begin{enumerate}
+ 
+\item import the directory (\emph{e.g.}, FullSWOF\_UI-1.01.00) into Eclipse.
+\item create the archive (.jar file)
+
+\begin{enumerate}
+\item go to the menu ``File->Export'', select ``Runnable JAR file'' and click on ``Next''.
+\item in the field ``Export Destination'', put the name of the .jar file (\emph{e.g.} FullSWOF\_UI-v1.01.00.jar).
+\item in ``Library handling'', select ``Package required libraries into generated JAR''.
+\item click on ``Finish''.
+\end{enumerate}
+
+\item add the two licence files to the .jar file
+
+\begin{verbatim}
+zip FullSWOF_UI-1.01.00.jar FullSWOF_UI-1.01.00/LICENSE_en.txt \
+FullSWOF_UI-1.01.00/LICENSE_fr.txt
+\end{verbatim}
+
+\item check the .jar file is running properly
+\begin{verbatim}
+java -jar FullSWOF_UI-1.01.00.jar
+\end{verbatim}
+
+\end{enumerate} 
+
+\color{black}
+
+\item remove the file directory
+\begin{verbatim}
+rm -rf FullSWOF_2D-1.04.04
+\end{verbatim}
+\end{enumerate}
+
+
+\section{From upload to messages}
+\begin{enumerate}
+\item Release the file:
+\begin{enumerate}
+\item Log in the SourceSup website and go to the project tab ``Files''.
+\item Click on ``To create a new release click here.''
+\item Fill the fields, \emph{e.g.}:\\
+\emph{Remark: for \FullSWOFUI, compatibility with \FullSWOFoneD{} and \FullSWOFtwoD{} should be specified.}
+\begin{verbatim}
+Release name: 1.04.04
+File Name: <Select the proper file>
+File type: Source .zip
+Processor type: Any
+Release Notes:
+     FullSWOF_2D release 1.04.04
+     This is a major update introducing new features.
+     It also include bug fixes.
+Change Log:
+     Main changes:
+       - add of infiltration
+       - add of rain
+     For details see file changelog.txt
+\end{verbatim}
+\item Click on ``Release file''.
+\end{enumerate}
+
+\color[gray]{0.4}
+\item In case of \FullSWOFUI{}, add the jar file in the Release file:
+\begin{enumerate}
+\item Go to the project tab ``Files''.
+\item In the ``Project Filelist'' page, click on ``Administration.''
+\item In the ``Releases'' part, click on ``[Edit Releases]''.
+\item Click on ``[Edit]'' for the corresponding release.
+\item In the part ``Add Files To This Release''.
+\begin{verbatim}
+File Name: <Select the proper file>
+File type: .jar
+Processor type: Any
+\end{verbatim}
+\item Click on ``Add This File''.
+
+\end{enumerate}
+
+\color{black}
+
+\item Add documents on the web site:
+\begin{enumerate}
+\item Copy the corresponding documentation (\emph{e.g.} Documentation.pdf to Documentation-v1.04.04.pdf) and add it to the documents of Sourcesup, in the doc folder.
+\item Copy the corresponding documentation for developers (\emph{e.g.} refman.pdf to refman-v1.04.04.pdf) and add it to the documents of Sourcesup, in the doc folder. 
+\end{enumerate}
+\item Post news:
+\begin{enumerate}
+\item Go to the project tab ``News''.
+\item Click on ``Submit''.
+\item Add a subject, such as:
+\begin{verbatim}
+Release of FullSWOF_2D 1.04.04 
+\end{verbatim}
+\item Add some details in the panel, such as:\\
+\emph{Remark: for \FullSWOFUI, compatibility with \FullSWOFoneD{} and \FullSWOFtwoD{} should be specified.}
+\begin{verbatim}
+The FullSWOF development team is pleased to announce
+the release of FullSWOF_2D 1.04.04.
+This is just a minor bug release:
+the previous release (1.04.03) did not compile under windows (cygwin).
+No other changes.
+\end{verbatim}
+\item Click on ``Submit''.
+\end{enumerate}
+\item Send an email to the relevant list (\href{mailto:fullswof.infos@listes.univ-orleans.fr}{fullswof.infos@listes.univ-orleans.fr}
+or
+\href{mailto:swashes.infos@listes.univ-orleans.fr}{swashes.infos@listes. univ-orleans.fr}), such as:\\
+\emph{Remark: for \FullSWOFUI, compatibility with \FullSWOFoneD{} and \FullSWOFtwoD{} should be specified.}
+\begin{verbatim}
+Title: FullSWOF_2D : release 1.04.04 : bug fix (compilation pb)
+
+Dear FullSWOF enthusiasts,
+
+I have just released a new version of FullSWOF_2D (release 1.04.04).
+It can be downloaded here:
+<https://sourcesup.renater.fr/frs/shownotes.php?release_id=2430>
+
+This is just a minor bug fix: FullSWOF_2D release 1.04.03 did not
+compile under windows cygwin (Bug #8814).
+
+If you are using the release 1.04.03 and if it compiled smoothly
+under your system, you do not have to worry about it. Just keep working!
+
+Cheers.
+
+The FullSWOF development team 
+\end{verbatim}
+\end{enumerate}
+
+\part{For Windows release}
+\setcounter{section}{0}
+
+Releasing \emph{Windows}-specific packages for a new version of \FullSWOFoneD, \FullSWOFtwoD{}, \FullSWOFUI{} or \SWASHES{} requires a succession of operations using various tools. 
+This part details these steps.
+
+
+\section{\SWASHES{}}
+
+\subsection{From zip to \_win.zip}
+\begin{enumerate}
+\item Uncompress the general package of \SWASHES{} (\emph{i.e.} the zip file)
+\item In the file ``Makefile'', change the first lines into
+\begin{verbatim}
+CC=i686-w64-mingw32-g++
+
+SRCDIR=Sources
+HEADDIR=Headers
+OBJDIR=obj
+BINDIR=bin
+
+CFLAGS= -I$(HEADDIR) -Wall -pedantic -O3 -static
+
+EXEC=swashes_win.exe
+\end{verbatim}
+\item Start cygwin and go to the main directory.
+\item Launch ``make''.\\
+In bin/, you should now have ``swashes\_win.exe''
+\item Uncompress the original zip file and add ``\_win'' to the directory name.
+\item Create the \_win.zip file
+\begin{verbatim}
+zip -r SWASHES-1.01.04_win.zip SWASHES-1.01.04_win
+\end{verbatim}
+\item Inside this new zip file, add to bin/
+	\begin{itemize}
+		\item CommandLinePrompt.lnk
+		\item swashes\_win.exe
+	\end{itemize}
+\item Add to ./ an updated version of the file README\_win.txt.
+\item Create a text file (\emph{e.g.} comment.txt) with some info such as
+\begin{verbatim}
+SWASHES release 1.01.04 for Windows
+<https://sourcesup.renater.fr/projects/swashes/>
+\end{verbatim}
+\item Add this info to the zip file
+\begin{verbatim}
+zip --archive-comment SWASHES-1.01.04_win.zip < comment.txt
+\end{verbatim}
+\item Remove the file directory
+\begin{verbatim}
+rm -rf SWASHES-1.01.04_win
+\end{verbatim}
+
+\item Test the \_win.zip file under winxp, win7.32 and win7.64 by
+double-clicking on CommandLinePrompt.lnk and launching
+\begin{verbatim}
+swashes_win.exe 2 1 1 2 100 200 > result.txt
+\end{verbatim}
+\end{enumerate}
+
+\subsection{From upload to messages}
+\begin{enumerate}
+\item Release the \_win.zip file:
+\begin{enumerate}
+\item Log in the SourceSup website and go to the project tab ``Files''.
+\item Click on ``Administration''.
+\item Click on ``[Edit Releases]'' (at the bottom).
+\item Click on the ``[Edit]'' of the relevant release.
+\item In the field ``Paste The Notes In:'', add something like:
+\begin{verbatim}
+A Windows exe is also available in a specific package.
+It can run on winxp, win7 32 bits and win 7 64 bits.
+For details see file README_win.txt in the _win.zip file.
+\end{verbatim}
+\item Click on ``Submit/Refresh''.
+\item In the section ``Add Files To This Release'', select the \_win.zip file,
+the file type (``.zip'') and the processor type  (``i386''). Click on ``Add this file''.
+\end{enumerate}
+\item Post news:
+\begin{enumerate}
+\item Go to the project tab ``News''.
+\item Click on ``Submit''.
+\item Add a subject, such as:
+\begin{verbatim}
+Windows release of SWASHES 1.01.04 
+\end{verbatim}
+\item Add some details in the panel, such as:
+\begin{verbatim}
+The SWASHES development team is pleased to announce
+the release of the Windows package of SWASHES 1.01.04.
+It is similar to the general package, but contains a Windows executable 
+able to run under winxp, win7 32 bits and win 7 64 bits.
+\end{verbatim}
+\item Click on ``Submit''.
+\end{enumerate}
+\item Send an email to the list
+\href{mailto:swashes.infos@listes.univ-orleans.fr}{swashes.infos@listes.univ-orleans.fr}, such as:
+\begin{verbatim}
+Title: SWASHES: Release 1.01.04 for Windows
+
+Dear SWASHES enthusiasts,
+
+We have just released a version of SWASHES 1.01.04 for Windows.
+It can be downloaded here: <https://sourcesup.renater.fr/frs/?group_id=876> 
+(file SWASHES-1.01.04_win.zip)
+
+It is designed to help Windows users to run SWASHES on their exploitation 
+system. The package contains an executable able to run under winxp, 
+win7 32 bits and win 7 64 bits.
+
+For details see file README_win.txt .
+
+Cheers.
+
+The SWASHES development team 
+\end{verbatim}
+\end{enumerate}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{\FullSWOFoneD{}}
+
+\subsection{From zip to \_win.zip}
+\begin{enumerate}
+\item Uncompress the general package of \FullSWOFoneD{} (\emph{i.e.} the zip file).
+\item In the file ``make\_config'', change the line
+\begin{verbatim}
+CPP	= g++
+\end{verbatim}
+into
+\begin{verbatim}
+CPP	= i686-w64-mingw32-g++
+\end{verbatim}
+\item In the file ``Makefile'', change the line
+\begin{verbatim}
+TARGET := FullSWOF_1D
+\end{verbatim}
+into
+\begin{verbatim}
+TARGET := FullSWOF_1D_win.exe
+\end{verbatim}
+and add
+\begin{verbatim}
+-static
+\end{verbatim}
+at the end of the line
+\begin{verbatim}
+LIBRARY := -lschemes -lboundaryconditions [...] -lparameters -lparser
+\end{verbatim}
+%\begin{verbatim}
+%LIBRARY := -lschemes -lboundaryconditions -lflux -lfrictions -lrain_infiltration -linitializations -lreconstructions -llimitations -lsave -lparameters -lparser
+%\end{verbatim}
+\item Start cygwin and go to the main directory.
+\item Launch ``make''.\\
+In bin/, you should now have ``FullSWOF\_1D\_win.exe''.
+\item Uncompress the original zip file and add ``\_win'' to the directory name.
+\item Create the \_win.zip file
+\begin{verbatim}
+zip -r FullSWOF_1D-1.01.00_win.zip FullSWOF_1D-1.01.00_win
+\end{verbatim}
+\item Inside this new zip file, add to Exp01/
+	\begin{itemize}
+		\item CommandLinePrompt.lnk
+		\item FullSWOF\_1D\_win.exe
+	\end{itemize}
+\item Add to ./ an updated version of the file README\_win.txt.
+\item Create a text file (\emph{e.g.} comment.txt) with some info such as
+\begin{verbatim}
+FullSWOF_1D release 1.01.00 for Windows
+<https://sourcesup.renater.fr/projects/fullswof-1d/>
+\end{verbatim}
+\item Add this info to the zip file
+\begin{verbatim}
+zip --archive-comment FullSWOF_1D-1.01.00_win.zip < comment.txt
+\end{verbatim}
+\item Remove the file directory
+\begin{verbatim}
+rm -rf FullSWOF_1D-1.01.00_win
+\end{verbatim}
+
+\item Test the \_win.zip file under winxp, win7.32 and win7.64 by
+double-clicking on CommandLinePrompt.lnk and launching
+\begin{verbatim}
+FullSWOF_1D_win.exe
+\end{verbatim}
+\end{enumerate}
+
+\subsection{From upload to messages}
+\begin{enumerate}
+\item Release the \_win.zip file:
+\begin{enumerate}
+\item Log in the SourceSup website and go to the project tab ``Files''.
+\item Click on ``Administration''.
+\item Click on ``[Edit Releases]'' (at the bottom).
+\item Click on the ``[Edit]'' of the relevant release.
+\item In the field ``Paste The Notes In:'', add something like:
+\begin{verbatim}
+A Windows exe is also available in a specific package 
+for EVALUATION PURPOSE ONLY.
+It can run on winxp, win7 32 bits and win 7 64 bits.
+For details see file README_win.txt in the _win.zip file.
+\end{verbatim}
+\item Click on ``Submit/Refresh''.
+\item In the section ``Add Files To This Release'', select the \_win.zip file,
+the file type (``.zip'') and the processor type  (``i386''). Click on ``Add this file''.
+\end{enumerate}
+\item Post news:
+\begin{enumerate}
+\item Go to the project tab ``News''.
+\item Click on ``Submit''.
+\item Add a subject, such as:
+\begin{verbatim}
+Windows release of FullSWOF_1D 1.01.00
+\end{verbatim}
+\item Add some details in the panel, such as:
+\begin{verbatim}
+The FullSWOF development team is pleased to announce
+the release of the Windows package of FullSWOF_1D 1.01.00.
+It is similar to the general package, but contains a Windows executable 
+able to run under winxp, win7 32 bits and win 7 64 bits.
+It is distributed for EVALUATION PURPOSE ONLY.
+\end{verbatim}
+\item Click on ``Submit''.
+\end{enumerate}
+\item Send an email to the list
+\href{mailto:fullswof.infos@listes.univ-orleans.fr}{fullswof.infos@listes.univ-orleans.fr}), such as:
+\begin{verbatim}
+Title: FullSWOF_1D: Release 1.01.00 for Windows
+
+Dear FullSWOF_1D enthusiasts,
+
+We have just released a version of FullSWOF_1D 1.01.00 for Windows.
+It can be downloaded here: <https://sourcesup.renater.fr/frs/?group_id=877>
+(file FullSWOF_1D-1.02.00_win.zip)
+
+It is designed to help Windows users to run FullSWOF_1D on their 
+exploitation system. The package contains an executable able to run  
+under winxp, win7 32 bits and win 7 64 bits.
+It is distributed for EVALUATION PURPOSE ONLY.
+
+For details see file README_win.txt .
+
+Cheers.
+
+The FullSWOF development team 
+\end{verbatim}
+\end{enumerate}
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{\FullSWOFtwoD{}}
+
+\subsection{From zip to \_win.zip}
+\begin{enumerate}
+\item Uncompress the general package of \FullSWOFtwoD{} (\emph{i.e.} the zip file).
+\item In the file ``make\_config'', change the line
+\begin{verbatim}
+CPP	= g++
+\end{verbatim}
+into
+\begin{verbatim}
+CPP	= i686-w64-mingw32-g++
+\end{verbatim}
+\item In the file ``Makefile'', change the line
+\begin{verbatim}
+TARGET := FullSWOF_2D
+\end{verbatim}
+into
+\begin{verbatim}
+TARGET := FullSWOF_2D_win.exe
+\end{verbatim}
+and add
+\begin{verbatim}
+-static
+\end{verbatim}
+at the end of the line
+%\begin{verbatim}
+%LIBRARY := -lschemes -lboundaryconditions -lflux -lfrictions -lrain_infiltration -linitializations -lreconstructions -llimitations -lsave -lparameters -lparser
+%\end{verbatim}
+\begin{verbatim}
+LIBRARY := -lschemes -lboundaryconditions [...] -lparameters -lparser
+\end{verbatim}
+\item Start cygwin and go to the main directory.
+\item Launch ``make''.\\
+In bin/, you should now have ``FullSWOF\_2D\_win.exe''.
+\item Uncompress the original zip file and add ``\_win'' to the directory name.
+\item Create the \_win.zip file
+\begin{verbatim}
+zip -r FullSWOF_2D-1.04.04_win.zip FullSWOF_2D-1.04.04_win
+\end{verbatim}
+\item Inside this new zip file, add to Exp01/
+	\begin{itemize}
+		\item CommandLinePrompt.lnk
+		\item FullSWOF\_2D\_win.exe
+	\end{itemize}
+\item Add to ./ an updated version of the file README\_win.txt.
+\item create a text file (\emph{e.g.} comment.txt) with some info such as
+\begin{verbatim}
+FullSWOF_2D release 1.04.04 for Windows
+<https://sourcesup.renater.fr/projects/fullswof-2d/>
+\end{verbatim}
+\item Add this info to the zip file
+\begin{verbatim}
+zip --archive-comment FullSWOF_2D-1.04.04_win.zip < comment.txt
+\end{verbatim}
+\item Remove the file directory
+\begin{verbatim}
+rm -rf FullSWOF_2D-1.04.04_win
+\end{verbatim}
+
+\item Test the \_win.zip file under winxp, win7.32 and win7.64 by
+double-clicking on CommandLinePrompt.lnk and launching
+\begin{verbatim}
+FullSWOF_2D_win.exe
+\end{verbatim}
+\end{enumerate}
+
+\subsection{From upload to messages}
+\begin{enumerate}
+\item Release the \_win.zip file:
+\begin{enumerate}
+\item Log in the SourceSup website and go to the project tab ``Files''.
+\item Click on ``Administration''.
+\item Click on ``[Edit Releases]'' (at the bottom).
+\item Click on the ``[Edit]'' of the relevant release.
+\item In the field ``Paste The Notes In:'', add something like:
+\begin{verbatim}
+A Windows exe is also available in a specific package 
+for EVALUATION PURPOSE ONLY.
+It can run on winxp, win7 32 bits and win 7 64 bits.
+For details see file README_win.txt in the _win.zip file.
+\end{verbatim}
+\item Click on ``Submit/Refresh''.
+\item In the section ``Add Files To This Release'', select the \_win.zip file,
+the file type (``.zip'') and the processor type  (``i386''). Click on ``Add this file''.
+\end{enumerate}
+\item Post news:
+\begin{enumerate}
+\item Go to the project tab ``News''.
+\item Click on ``Submit''.
+\item Add a subject, such as:
+\begin{verbatim}
+Windows release of FullSWOF_2D 1.04.04
+\end{verbatim}
+\item Add some details in the panel, such as:
+\begin{verbatim}
+The FullSWOF development team is pleased to announce
+the release of the Windows package of FullSWOF_2D 1.04.04.
+It is similar to the general package, but contains a Windows executable 
+able to run under winxp, win7 32 bits and win 7 64 bits.
+It is distributed for EVALUATION PURPOSE ONLY.
+\end{verbatim}
+\item Click on ``Submit''.
+\end{enumerate}
+\item Send an email to the list
+\href{mailto:fullswof.infos@listes.univ-orleans.fr}{fullswof.infos@listes.univ-orleans.fr}, such as:
+\begin{verbatim}
+Title: FullSWOF_2D: Release 1.04.04 for Windows
+
+Dear FullSWOF_2D enthusiasts,
+
+We have just released a version of FullSWOF_2D 1.04.04 for Windows.
+It can be downloaded here: <https://sourcesup.renater.fr/frs/?group_id=895>
+(file FullSWOF_2D-1.04.04_win.zip)
+
+It is designed to help Windows users to run FullSWOF_2D on their 
+exploitation system. The package contains an executable able to run 
+under winxp, win7 32 bits and win 7 64 bits.
+It is distributed for EVALUATION PURPOSE ONLY.
+
+For details see file README_win.txt .
+
+Cheers.
+
+The FullSWOF development team 
+\end{verbatim}
+\end{enumerate}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+\section{\FullSWOFUI{}}
+
+
+\subsection{From .jar  to \_win.zip}
+\begin{enumerate}
+
+\item Create a directory named FullSWOF\_UI-1.01.00\_win .
+
+\item Copy the jar file of \FullSWOFUI{} into it.
+
+\item Unpack the FullSWOF\_1D\_win.zip and FullSWOF\_2D\_win.zip files into it.
+
+\item In the FullSWOF\_1D\_win and FullSWOF\_2D\_win directories, delete the make\_config and Makefile files, and all the sub-directories except Exp01/ .
+
+\item Add to ./ the files 
+FullSWOF\_UI-1.01.00/util/User\_Manual\_en.pdf and
+FullSWOF\_UI-1.01.00/util/User\_Manual\_fr.pdf.
+
+\item Add to ./ the two license files FullSWOF\_UI-1.01.00/LICENSE\_en.txt and
+FullSWOF\_UI-1.01.00/LICENSE\_fr.txt.
+
+\item Add to ./ an updated version of the file README\_win.txt.
+
+\item Create the zip file
+\begin{verbatim}
+zip -r FullSWOF_UI-1.01.00_win.zip FullSWOF_UI-1.01.00_win
+\end{verbatim}
+\item Create a text file (\emph{e.g.} comment.txt) with some info such as
+\begin{verbatim}
+FullSWOF_UI release 1.01.00 for Windows
+<https://sourcesup.renater.fr/projects/fullswof-ui/>
+\end{verbatim}
+\item Add this info to the zip file
+\begin{verbatim}
+zip --archive-comment FullSWOF_UI-1.01.00_win.zip < comment.txt
+\end{verbatim}
+\item Remove the file directory
+\begin{verbatim}
+rm -rf FullSWOF_UI-1.01.00_win
+\end{verbatim}
+\item Test the \_win.zip file under winxp, win7.32 and win7.64 by
+double-clicking on the .jar file and launching FullSWOF\_1D and FullSWOF\_2D computations.
+\end{enumerate}
+
+
+\subsection{From upload to messages}
+\begin{enumerate}
+\item Release the \_win.zip file:
+\begin{enumerate}
+\item Log in the SourceSup website and go to the project tab ``Files''.
+\item Click on ``Administration''.
+\item Click on ``[Edit Releases]'' (at the bottom).
+\item Click on the ``[Edit]'' of the relevant release.
+\item In the field ``Paste The Notes In:'', add something like:
+\begin{verbatim}
+A Windows package is also available.
+This package is designed to help you test FullSWOF under Windows.
+It is provided for EVALUATION PURPOSE ONLY.
+It can run on winxp, win7 32 bits and win 7 64 bits.
+For details see file README_win.txt in the _win.zip file.
+\end{verbatim}
+\item Click on ``Submit/Refresh''.
+\item In the section ``Add Files To This Release'', select the \_win.zip file,
+the file type (``.zip'') and the processor type  (``i386''). Click on ``Add this file''.
+\end{enumerate}
+\item Post news:
+\begin{enumerate}
+\item Go to the project tab ``News''.
+\item Click on ``Submit''.
+\item Add a subject, such as:
+\begin{verbatim}
+Windows release of FullSWOF_UI 1.01.00
+\end{verbatim}
+\item Add some details in the panel, such as:
+\begin{verbatim}
+The FullSWOF development team is pleased to announce
+the release of the Windows package of FullSWOF_UI 1.01.00.
+It contains the FullSWOF_UI jar file, the FullSWOF_1D and FullSWOF_2D 
+exe files able to run under winxp, win7 32 bits and win 7 64 bits.
+It is distributed for EVALUATION PURPOSE ONLY.
+\end{verbatim}
+\item Click on ``Submit''.
+\end{enumerate}
+\item Send an email to the list
+\href{mailto:fullswof.infos@listes.univ-orleans.fr}{fullswof.infos@listes.univ-orleans.fr}, such as:
+\begin{verbatim}
+Title: FullSWOF_UI: Release 1.01.00 for Windows
+
+Dear FullSWOF_UI enthusiasts,
+
+We have just released a version of FullSWOF_UI 1.01.00 for Windows.
+It can be downloaded here: <https://sourcesup.renater.fr/frs/?group_id=997>
+(file FullSWOF_UI-1.01.00_win.zip)
+It is designed to help Windows users to run FullSWOF on their 
+exploitation system. It contains the FullSWOF_UI jar file, the FullSWOF_1D   
+and FullSWOF_2D exe files able to run under winxp, win7 32 bits and 
+win 7 64 bits.
+It is distributed for EVALUATION PURPOSE ONLY.
+
+For details see file README_win.txt .
+
+Cheers.
+
+The FullSWOF development team 
+\end{verbatim}
+\end{enumerate}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+
+\end{document}
+

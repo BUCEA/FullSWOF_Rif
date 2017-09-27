@@ -1,0 +1,100 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX spellcheck = en_US
+
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+
+% Specific commands
+\newcommand{\FullSWOFnD}{\emph{FullSWOF\_1D/2D}}
+\newcommand{\FullSWOFoneD}{\emph{FullSWOF\_1D}}
+\newcommand{\FullSWOFtwoD}{\emph{FullSWOF\_2D}}
+\newcommand{\SWASHES}{\emph{SWASHES}}
+\newcommand{\contactFullName}{Frédéric \textsc{Darboux}}
+\newcommand{\contactEmail}{\href{mailto:Frederic.Darboux@orleans.inra.fr}{Frederic.Darboux@orleans.inra.fr}}
+\newcommand{\MainWebSiteFSoneD}{\url{https://sourcesup.renater.fr/projects/fullswof-1d/}}
+\newcommand{\MainWebSiteFStwoD}{\url{https://sourcesup.renater.fr/projects/fullswof-2d/}}
+\newcommand{\MainWebSiteSWASHES}{\url{https://sourcesup.renater.fr/projects/swashes/}}
+
+% Headers and footers
+\lhead{Running \FullSWOFnD{} or \SWASHES{} under windows}
+\rhead{INRA-UR272-Sols --- MAPMO}
+\cfoot{\thepage /\pageref{LastPage}}
+\pagestyle{fancy}
+
+% Lists: no spacing between items
+\setlist{noitemsep}
+
+\title{Application note:\\
+Using Cygwin to compile and run\\
+\FullSWOFoneD, \FullSWOFtwoD{} or \SWASHES{}\\
+under windows.}
+
+\author{\contactFullName, \contactEmail}
+\date{2013-09-04}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy}
+
+\FullSWOFoneD, \FullSWOFtwoD{} and \SWASHES{} have been developed under Unix-like environments. Although it may not be required, it is convenient to use such a Unix-like environment under windows. This application note gives directions about installing the Unix-like environment Cygwin, and using it to compile and run  \FullSWOFoneD, \FullSWOFtwoD{} and \SWASHES{}.
+
+\section{Installation of Cygwin}
+
+\begin{enumerate}
+\item From \url{www.cygwin.com}, download the file \textbf{setup.exe} and save it into a dedicated directory (e.g. \verb!c:\software\cygwin_install!).
+\item Launch \textbf{setup.exe}.
+\item Click on the ``next'' button on the first screens. Then, choose a download site (next to you) and click on the ``next'' button once more. You will be prompted to select packages. A basic set of packages are already selected. To compile the software smoothly, you need to add a few more packages by clicking on ``skip'':
+	\begin{itemize}
+	\item from the category ``Archive''
+		\begin{itemize}
+		\item unzip: Info-ZIP decompression utility
+		\end{itemize}
+	\item from the category ``Devel''
+		\begin{itemize}
+		\item gcc-g++: C++ compiler 
+		\item make: The GNU version of the 'make' utility
+		\end{itemize}
+	\end{itemize}
+Additionally, if you want to display graphs using gnuplot, you also need:
+	\begin{itemize}
+	\item from the category ``Graphics''
+		\begin{itemize}
+		\item gnuplot: A command-line driven interactive function plotting utility
+		\end{itemize}
+	\item from the category ``X11''
+		\begin{itemize}
+		\item xorg-server: X.org X servers
+		\item xinit: X.org X server initializer
+		\end{itemize}
+	\end{itemize}
+\item Then click ``next'' up to the start of downloading.
+\item Finally, click ``End''.
+\end{enumerate}
+
+This will use about of  250~MB (490~MB with gnuplot).
+
+\section{Compiling and running the software}
+
+\begin{enumerate}
+\item Download the \FullSWOFoneD\footnote{\MainWebSiteFSoneD}, \FullSWOFtwoD{}\footnote{\MainWebSiteFStwoD} or \SWASHES{}\footnote{\MainWebSiteSWASHES} package into a dedicated directory.
+\item Open a Cygwin terminal using the desktop icon or the menu.
+\item Move to your dedicated directory. For example, to access the directory \verb!D:\user\code!, you should enter the command \verb!cd /cygdrive/d/user/code!
+\item Unzip the package (e.g. \verb!unzip package.zip!).
+\item Move to the newly-created directory. This directory will contain all the files related to the source code.
+\item Refer to the software-specific documentation to compile and run the code.
+\item To use gnuplot, open the cygwin terminal and type \verb!startx!. This will launch the X server. Then type \verb!gnuplot!.
+\end{enumerate}
+
+\emph{For more information about Cygwin, see \url{http://www.cygwin.com}}
+
+\end{document}

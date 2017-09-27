@@ -1,0 +1,138 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX spellcheck = en_US
+
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+
+%% Specific commands
+% the only place to specify version number (for consistency) - the date is the last modif for the code
+\newcommand{\version}{1.04.10 (2014-02-05)}
+\newcommand{\FullSWOF}{\emph{FullSWOF\_2D}}
+\newcommand{\contactFullName}{Christian \textsc{Laguerre}, Fr\'ed\'eric \textsc{Darboux} and Carine \textsc{Lucas}}
+\newcommand{\contactEmail}{ \href{mailto:christian.laguerre@math.cnrs.fr}{christian.laguerre@math.cnrs.fr}, \href{mailto:frederic.darboux@orleans.inra.fr}{frederic.darboux@orleans.inra.fr}, \href{mailto:carine.lucas@univ-orleans.fr}{carine.lucas@univ-orleans.fr}}
+\newcommand{\MainWebSite}{\url{https://sourcesup.renater.fr/projects/fullswof-1d/}}
+\newtheorem{cl}{Conclusion}
+
+% Headers and footers
+\lhead{\FullSWOF{} v\version}
+\rhead{MAPMO --- INRA}
+\cfoot{\thepage /\pageref{LastPage}}
+\pagestyle{fancy}
+
+% Lists: no spacing between items
+\setlist{noitemsep}
+
+\title{Improving the accuracy of floating-point computations
+in~\FullSWOF{}.}
+
+\author{\contactFullName\\ \contactEmail}
+\date{2014-02-05} % Last modif for the note
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy}
+
+This report contains a study of the influence of compiler options on the benchmark results.\\ 
+It is similar to the report \texttt{Floating\_Points.pdf} (\url{https://sourcesup.renater.fr/docman/?group_id=877&view=listfile&dirid=1052}) which was performed on the software \emph{\textit{FullSWOF\_1D}}.
+ Indeed, when running the 8~benchmarks of \emph{\textit{FullSWOF\_2D}} on several computers, we noticed differences in the results for one benchmark: the bump at rest. 
+Performing some further testing, we also uncover some problems of symmetry: for example, inverting the geometry of the dam break from left-to-right to right-to-left did more than simply inverted the results.
+
+These differences originated from approximations in the floating-point computations, and these approximations depended on the computer. After a diagnosis phase, various changes were made, both in the code and in the compiler options. In this report, we run \FullSWOF{} to determine the impact of these changes.
+
+\section*{Testing \& Changes}
+
+The first change we made was to replace each $x^2-y^2$ by $(x-y)(x+y)$. This modification affected the main part of the numerical scheme (see \texttt{scheme.cpp})
+for the time evolution of the discharge and some fluxes. 
+It is well-known that this way of computing reduces floating-point errors. 
+For more details, we refer to \url{http://www.codeproject.com/Articles/29637/Five-Tips-for-Floating-Point-Programming}
+and references therein. 
+
+In order to solve symmetry problems, we had to use long doubles in some parts of the code. Namely, 
+a computation with long double is now done in \FullSWOF{} in \texttt{hll.cpp}, \texttt{muscl.cpp}, \texttt{scheme.cpp}.
+Moreover, the compilation option \texttt{-ffloat-store} was added. 
+
+Let us study the influence of these changes on the results. In the following, we make a distinction between a 64-bit computer  and a 32-bit computer under Linux Ubuntu.
+GNU C++ was used in both cases.
+
+Only one out of the eight benchmarks differed depending on the float type and compilation option: the bump at rest. 
+This test case involves very small perturbations of water height, and null velocities, so this may explain the difficulties to catch the analytic solution.
+
+This study (see tables~\ref{Mac}-\ref{Linux}) shows that each long double is necessary to obtain results exactly identical to the reference solution. 
+Moreover, it points out that the \texttt{-ffloat-store} option improves the result accuracy but roughly doubles the computation time. 
+However, excepted for some specific points and output variables (especially the Froude number), most of differences were relatively small.
+
+\section*{Conclusions \& Recommendations}
+
+\begin{itemize}
+\item There are still differences whether you run \FullSWOF{} under a 32-bit or a 64-bit operating system.
+
+\item The option \texttt{-ffloat-store} helps in obtaining accurate results for very small water heights. This is useful in order to compare the numerical results with analytic solutions. 
+But if you want to compare the numerical results with experimental results, you can remove this option to save computation time, especially if very shallow flows are not involved.
+In particular, you should keep in mind that this option is very time consuming and you must balance the accuracy versus the computation time. 
+
+\item Other improvements could be done. Do not hesitate to suggest modifications!
+
+\item Currently, only the HLL and the MUSCL reconstruction have been tested and modified. Tests should also be done for the other fluxes and reconstructions. 
+\end{itemize}
+
+
+\begin{table}[htbp]
+\begin{tabular}{ccccccc}
+\hline
+& & & & & Difference& Computation \\
+Experiment & Long double & Long double & Long double & -ffloat&with reference& time (Mega\\
+number & HLL & MUSCL & scheme & -store&  (bump at rest)  & clock ticks)  \\
+& & & & & & \\
+\hline
+reference & yes & yes & yes &yes &&467\\
+1 & no & yes & yes &yes & yes&428\\
+2 & no & yes & yes &no & yes =1&192\\
+3 & yes & no & yes &yes &no&470\\
+4 & yes & no & yes &no &no&200\\
+5 & yes & yes & no &yes &yes&444\\
+6 & yes & yes & no &no &yes =5&199\\
+7 & yes & yes & yes &no &no&197\\
+\hline
+\end{tabular}
+\caption{Linux - 64 bits}
+\label{Mac}
+\end{table}
+
+\begin{table}[htbp]
+\begin{tabular}{ccccccc}
+\hline
+& & & & & Difference& Computation \\
+Experiment & Long double & Long double & Long double & -ffloat&with reference& time (Mega\\
+number & HLL & MUSCL & scheme & -store&  (bump at rest)  & clock ticks)  \\
+& & & & & & \\
+\hline
+reference & yes & yes & yes &yes && 977\\
+1 & no & yes & yes &yes & yes& 919\\
+2 & no & yes & yes &no & yes& 520\\
+3 & yes & no & yes &yes &no&987\\
+4 & yes & no & yes &no &yes& 482\\
+5 & yes & yes & no &yes &yes& 964\\
+6 & yes & yes & no &no &yes&457\\
+7 & yes & yes & yes &no &yes =6& 465\\
+\hline
+\end{tabular}
+\caption{Linux - 32 bits}
+\label{Linux}
+\end{table}
+\end{document}
+
